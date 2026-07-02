@@ -1,0 +1,47 @@
+name: jira-teams-notifier
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes (UTC). GitHub may delay under load.
+  workflow_dispatch: {}      # lets you run it manually from the Actions tab
+
+# Prevent two scheduled runs from racing on the state.json cache.
+concurrency:
+  group: jira-teams-notifier
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Restore dedup state
+        uses: actions/cache/restore@v4
+        with:
+          path: state.json
+          key: jira-state-${{ github.run_id }}
+          restore-keys: |
+            jira-state-
+
+      - name: Poll Jira and notify Teams
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
+          JIRA_USER_KEY: ${{ secrets.JIRA_USER_KEY }}
+          JIRA_PAT: ${{ secrets.JIRA_PAT }}
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        run: python -m src.run
+
+      - name: Save dedup state
+        uses: actions/cache/save@v4
+        with:
+          path: state.json
+          key: jira-state-${{ github.run_id }}
