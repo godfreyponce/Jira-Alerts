@@ -15,10 +15,13 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 - **#5 built, awaiting owner acceptance**: comment alerts narrowed to currently-assigned
   tickets only (was: ever-assigned/reporter/watcher — too noisy), plus `MAX_CARDS_PER_CYCLE`
   flood valve (default 10; burst → one digest card, same card field contract, no flow change).
-- **Blocker: the Teams Power Automate flow is down** — webhook POSTs read-time-out and the
-  flow won't load in Teams for the owner. The Actions cron is `disabled_manually`; keep it
-  off until the flow works again, then: `gh workflow enable jira-teams-notifier`. All Actions
-  caches have expired, so the first cloud run will silently re-seed (correct, no flood).
+- **Blocker: Microsoft Power Automate outage (2026-07-23)** — the flows runtime for UTD's
+  default environment hangs (flow-list API calls never return; webhook POSTs time out; other
+  environment endpoints return 200). Portal's "You don't have any flows" is a timeout
+  fallback, NOT proof the flow was deleted. Multiple public outage reports same day. Fix =
+  wait for Microsoft. When a webhook probe returns 202: verify the test card landed, then
+  `gh workflow enable jira-teams-notifier` + one dispatch (expect silent re-seed — caches
+  expired). Cron stays `disabled_manually` until then.
 - 2026-07 throttle post-mortem: state.json was never committed and poll.yml was already
   cache-based; the ~42-card flood came from local runs, not the cron. No git-conflict
   failure mode exists.
