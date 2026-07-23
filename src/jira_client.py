@@ -5,11 +5,13 @@ scheme; Jira *Cloud* uses email+token Basic auth instead).
 
 Two JQL queries run each cycle and their issue sets are unioned:
 
-  A) "worked on"  -> issues where you are/were assignee, or are reporter/watcher
+  A) "assigned"   -> issues currently assigned to you
   B) "mentions"   -> issues whose comments text-match your username
 
 For every matched issue we pull recent comments and classify each one. A comment
-is relevant if it's on a worked-on issue OR its body contains a mention marker.
+is relevant if it's on a currently-assigned issue OR its body contains a mention
+marker. Tickets you merely watch, reported, or were once assigned to do NOT
+trigger comment alerts (they proved too noisy).
 """
 
 import re
@@ -92,37 +94,34 @@ def _mentions_me(body: str) -> bool:
 def collect_relevant_comments() -> List[RelevantComment]:
     window = config.LOOKBACK_MINUTES
 
-    worked_jql = (
-        "(assignee was currentUser() "
-        "OR reporter = currentUser() "
-        "OR watcher = currentUser()) "
+    assigned_jql = (
+        "assignee = currentUser() "
         f"AND updated >= -{window}m ORDER BY updated DESC"
     )
-    # Note: comment text search is best-effort for mention-only tickets you
-    # otherwise have no involvement in. Most mentions are also caught by the
-    # worked-on query above (you usually get added as a participant).
+    # Note: comment text search is best-effort, and the ONLY way to catch
+    # mentions on tickets not currently assigned to you.
     mention_jql = (
         f'comment ~ "{config.JIRA_USERNAME}" '
         f"AND updated >= -{window}m ORDER BY updated DESC"
     )
 
-    worked_issues = {i["key"]: i for i in _search(worked_jql)}
+    assigned_issues = {i["key"]: i for i in _search(assigned_jql)}
     try:
         mention_issues = {i["key"]: i for i in _search(mention_jql)}
     except requests.HTTPError:
         # Some DC text-index configs reject `comment ~`; degrade gracefully.
         mention_issues = {}
 
-    all_issues: Dict[str, dict] = {**mention_issues, **worked_issues}
+    all_issues: Dict[str, dict] = {**mention_issues, **assigned_issues}
 
     results: List[RelevantComment] = []
     for key, issue in all_issues.items():
         summary = issue.get("fields", {}).get("summary", "") or "(no summary)"
-        on_worked_issue = key in worked_issues
+        on_assigned_issue = key in assigned_issues
         for c in _comments(key):
             body = c.get("body", "") or ""
             mentions = _mentions_me(body)
-            if not (on_worked_issue or mentions):
+            if not (on_assigned_issue or mentions):
                 continue
             results.append(
                 RelevantComment(

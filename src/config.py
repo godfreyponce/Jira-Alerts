@@ -40,6 +40,10 @@ COMMENTS_PER_ISSUE = int(os.environ.get("COMMENTS_PER_ISSUE", "20"))
 # Truncate the comment snippet shown in the card to this many characters.
 SNIPPET_CHARS = int(os.environ.get("SNIPPET_CHARS", "280"))
 
+# Flood valve: if one cycle wants to send more cards than this, collapse the
+# burst into a single digest card so the Teams webhook is never throttled.
+MAX_CARDS_PER_CYCLE = int(os.environ.get("MAX_CARDS_PER_CYCLE", "10"))
+
 # Where dedup state lives (relative to repo root).
 STATE_PATH = os.environ.get("STATE_PATH", "state.json")
 

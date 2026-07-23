@@ -1,11 +1,15 @@
 """Entry point: one polling cycle.
 
 Three alert streams, all delivered through the same Teams webhook:
-  1. New comments on tickets you've worked on
-  2. New comments that @mention you
+  1. New comments on tickets currently assigned to you
+  2. New comments that @mention you (any ticket)
   3. Assignment changes on your breadcrumbed tickets:
        - a ticket becomes assigned to you      -> "Assigned to you"
        - a ticket leaves you (reassigned/unassigned) -> "Reassigned from you"
+
+FLOOD VALVE: if one cycle wants more than MAX_CARDS_PER_CYCLE cards, a single
+digest card is sent instead and the burst is suppressed (state still advances,
+so the burst never replays).
 
 Comments dedup via a seen-set. Assignments are detected by diffing the set of
 tickets currently assigned to you against last cycle's set (stored in
@@ -20,7 +24,7 @@ import sys
 from datetime import datetime, timezone
 
 from . import config, state
-from .cards import assigned_payload, comment_payload, reassigned_payload
+from .cards import assigned_payload, comment_payload, digest_payload, reassigned_payload
 from .jira_client import (
     collect_relevant_comments,
     current_assignments,
@@ -67,32 +71,15 @@ def main() -> int:
         print(f"Seeded {len(current_keys)} current assignment(s) silently.")
         # fall through to handle comments normally this cycle
 
-    # ---- Stream 1+2: new comments ----
+    # ---- Collect everything this cycle wants to send ----
     new_comments = [c for c in comments if not state.is_seen(st, c.comment_id)]
     new_comments.sort(key=lambda c: c.created)
-    for c in new_comments:
-        try:
-            send(comment_payload(c))
-            state.mark_seen(st, c.comment_id)
-            sent += 1
-            tag = " (mention)" if c.mentions_me else ""
-            print(f"Comment alert: {c.issue_key} {c.comment_id}{tag}")
-        except Exception as e:  # noqa: BLE001
-            print(f"Failed comment {c.issue_key} {c.comment_id}: {e}", file=sys.stderr)
 
-    # ---- Stream 3: assignment changes ----
     tracked = set(st["assignees"].keys())
     newly_assigned = current_keys - tracked
     left_me = tracked - current_keys
 
-    for k in sorted(newly_assigned):
-        try:
-            send(assigned_payload(k, assignments_now[k], ticket_url(k)))
-            sent += 1
-            print(f"Assigned alert: {k}")
-        except Exception as e:  # noqa: BLE001
-            print(f"Failed assigned {k}: {e}", file=sys.stderr)
-
+    reassigned = []  # (key, summary, new_assignee_or_None)
     if left_me:
         info = fetch_assignees(left_me)
         for k in sorted(left_me):
@@ -102,8 +89,46 @@ def main() -> int:
             if meta.get("is_me"):
                 print(f"Skipped {k}: left active set but still yours (closed?)")
                 continue
-            who = meta.get("assignee")
-            summ = meta.get("summary", "")
+            reassigned.append((k, meta.get("summary", ""), meta.get("assignee")))
+
+    total_pending = len(new_comments) + len(newly_assigned) + len(reassigned)
+
+    # ---- Flood valve: burst -> one digest card ----
+    if total_pending > config.MAX_CARDS_PER_CYCLE:
+        try:
+            send(digest_payload(len(new_comments), len(newly_assigned), len(reassigned)))
+            sent += 1
+            for c in new_comments:
+                state.mark_seen(st, c.comment_id)
+            print(
+                f"Digest alert: {total_pending} update(s) collapsed "
+                f"(cap {config.MAX_CARDS_PER_CYCLE})"
+            )
+        except Exception as e:  # noqa: BLE001
+            # Comments stay unseen so they retry next cycle.
+            print(f"Failed digest: {e}", file=sys.stderr)
+    else:
+        # ---- Stream 1+2: new comments ----
+        for c in new_comments:
+            try:
+                send(comment_payload(c))
+                state.mark_seen(st, c.comment_id)
+                sent += 1
+                tag = " (mention)" if c.mentions_me else ""
+                print(f"Comment alert: {c.issue_key} {c.comment_id}{tag}")
+            except Exception as e:  # noqa: BLE001
+                print(f"Failed comment {c.issue_key} {c.comment_id}: {e}", file=sys.stderr)
+
+        # ---- Stream 3: assignment changes ----
+        for k in sorted(newly_assigned):
+            try:
+                send(assigned_payload(k, assignments_now[k], ticket_url(k)))
+                sent += 1
+                print(f"Assigned alert: {k}")
+            except Exception as e:  # noqa: BLE001
+                print(f"Failed assigned {k}: {e}", file=sys.stderr)
+
+        for k, summ, who in reassigned:
             try:
                 send(reassigned_payload(k, summ, ticket_url(k), who))
                 sent += 1

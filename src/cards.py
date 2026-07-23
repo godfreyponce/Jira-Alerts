@@ -70,6 +70,33 @@ def assigned_payload(ticket: str, summary: str, url: str) -> dict:
     )
 
 
+def digest_payload(n_comments: int, n_assigned: int, n_reassigned: int) -> dict:
+    """Single card summarizing a burst that exceeded MAX_CARDS_PER_CYCLE.
+
+    Uses the same field contract as every other card so the flow layout
+    doesn't need to change.
+    """
+    total = n_comments + n_assigned + n_reassigned
+    parts = []
+    if n_comments:
+        parts.append(f"{n_comments} new comment(s)")
+    if n_assigned:
+        parts.append(f"{n_assigned} ticket(s) assigned to you")
+    if n_reassigned:
+        parts.append(f"{n_reassigned} ticket(s) reassigned away")
+    return _payload(
+        ticket="Digest",
+        summary=f"{total} Jira updates this cycle",
+        headline="Update burst",
+        subline=", ".join(parts),
+        snippet=(
+            f"More than {config.MAX_CARDS_PER_CYCLE} alerts in one cycle were "
+            "collapsed into this digest to avoid webhook throttling."
+        ),
+        url=f"{config.JIRA_BASE_URL}/issues/?jql=assignee%20%3D%20currentUser()",
+    )
+
+
 def reassigned_payload(ticket: str, summary: str, url: str, new_assignee) -> dict:
     who = new_assignee or "Unassigned"
     return _payload(

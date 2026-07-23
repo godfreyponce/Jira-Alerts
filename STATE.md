@@ -8,13 +8,20 @@ Repo: github.com/godfreyponce/Jira-Alerts (PUBLIC).
 *Thin snapshot — update continuously as work progresses. Per-feature detail: `docs/HISTORY.md`.
 Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 
-**Last updated: 2026-07-13**
+**Last updated: 2026-07-23**
 
 ## Now
 
-- Nothing mid-flight. Session convention adopted 2026-07-13; README's "Possible next steps"
-  are now GitHub Issues #1–#4 (none `ready-for-agent` yet — confirm with the owner first).
-- v1 is live; the Actions cron (`.github/workflows/poll.yml`) is the production path.
+- **#5 built, awaiting owner acceptance**: comment alerts narrowed to currently-assigned
+  tickets only (was: ever-assigned/reporter/watcher — too noisy), plus `MAX_CARDS_PER_CYCLE`
+  flood valve (default 10; burst → one digest card, same card field contract, no flow change).
+- **Blocker: the Teams Power Automate flow is down** — webhook POSTs read-time-out and the
+  flow won't load in Teams for the owner. The Actions cron is `disabled_manually`; keep it
+  off until the flow works again, then: `gh workflow enable jira-teams-notifier`. All Actions
+  caches have expired, so the first cloud run will silently re-seed (correct, no flood).
+- 2026-07 throttle post-mortem: state.json was never committed and poll.yml was already
+  cache-based; the ~42-card flood came from local runs, not the cron. No git-conflict
+  failure mode exists.
 
 ## Run / verify (do this first)
 
@@ -34,3 +41,6 @@ No test suite — verify = a real run with live creds, or `python -m py_compile 
 - README's `cp .env.example .env` step is broken — `.env.example` doesn't exist yet (#4).
 - @mention detection depends on Jira DC text-index tokenization; degrades gracefully if the
   server rejects text search.
+- Actions cache evicts after ~7 idle days → next cloud run silently re-seeds; events during
+  the gap are dropped by design. Assignment alerts also never retry a failed send (the diff
+  advances regardless) — only comment alerts retry.
