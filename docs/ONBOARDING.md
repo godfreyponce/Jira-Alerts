@@ -112,9 +112,12 @@ The first run seeds silently: it records every comment and assignment it current
 sees without notifying, so you don't get flooded with backlog. It prints something
 like `Initialized: seeded N comment(s) and M current assignment(s)`.
 
-To confirm the pipeline end to end, comment on a ticket assigned to you (or have
-someone @mention you), wait a moment, and run `python -m src.run` again. A card
-should land in your Teams chat.
+To confirm the webhook and flow work, run `./scripts/send-test.sh` — it fires a fake
+alert at your webhook and prints the HTTP status (expect 202, and a "Test alert"
+message in your Teams chat a moment later).
+
+To confirm the whole pipeline including Jira, comment on a ticket assigned to you (or
+have someone @mention you), wait a moment, and run `python -m src.run` again.
 
 If you ever want to re-seed from scratch, reset `state.json` to
 `{"initialized": false, "seen": {}}`.
