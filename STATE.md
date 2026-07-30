@@ -12,16 +12,12 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 
 ## Now
 
-- **Back online (2026-07-30)**: the Power Automate outage (2026-07-23 → ~07-30) resolved;
-  webhook probe returned 202, cron re-enabled, dispatch run silently re-seeded (1 comment,
-  41 assignments) and cache saved. Cron now live every 5 min.
-- **#5 awaiting owner acceptance**: comment alerts narrowed to currently-assigned tickets
-  only, plus `MAX_CARDS_PER_CYCLE` flood valve (default 10; burst → one digest card, same
-  card field contract, no flow change). Close #5 + write HISTORY.md entry once the owner
-  confirms the TEST card and a real card have landed in Teams.
-- 2026-07 throttle post-mortem: state.json was never committed and poll.yml was already
-  cache-based; the ~42-card flood came from local runs, not the cron. No git-conflict
-  failure mode exists.
+- **#5 closed 2026-07-30**: comment narrowing + flood valve accepted — owner confirmed the
+  TEST card and a real end-to-end "Assigned to you" card in Teams. Detail: `docs/HISTORY.md`.
+- **Watch: cron scheduler resume.** No schedule-triggered run since re-enable (last one
+  2026-06-30; today's runs were manual dispatches). The close-out push to main should
+  re-register the schedule — confirm a `schedule`-event run appears in
+  `gh run list --workflow=poll.yml` within ~30 min of the push; if not, that's a new issue.
 
 ## Run / verify (do this first)
 
