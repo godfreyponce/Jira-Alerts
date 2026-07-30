@@ -12,20 +12,19 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 
 ## Now
 
-- **Fully live in production (2026-07-30)**: #5 closed (comment narrowing + flood valve
-  accepted; detail in `docs/HISTORY.md`). The scheduler resumed after the close-out push
-  (it had been dormant since 06-30 — a push to main was indeed the fix), and the first
-  scheduled run at 16:01 UTC verified all three alert streams in one cycle: comment,
-  assigned, and reassigned cards all delivered. Nothing mid-flight; queue is in Issues.
-- **Watch: offset cron (c0218dd)** moved the schedule to off-peak minutes (:03,:08,…) after
-  scheduler lag left 20–30 min gaps. Awaiting the first scheduled runs at the new cadence;
-  an owner comment on an assigned ticket is pending as the hands-off verification. (#3
-  NAS timer closed — no NAS exists; if lag persists, escalation = external cron pinger,
-  new issue.)
-- **Rollout prep**: #8 onboarding guide is `ready-for-agent` but work starts only AFTER
-  the hands-off verification above passes (owner's call, 2026-07-30). #7 test-card
-  dispatch and #6 self-comment filter await green-light (#6 explicitly liked). Shareable
-  architecture explainer artifact exists (link with owner).
+- **Timer is launchd on the owner's Mac (2026-07-30, #10 closed)**: GitHub's scheduler
+  delivered ~1 run/hour vs a nominal 12 despite healthy config, so the cron moved local.
+  LaunchAgent `com.jiraalerts.poll` runs `scripts/run-local.sh` every 300 s
+  (ProcessType Background); log: `~/Library/Logs/jiraalerts.log`. Cloud workflow is
+  **disabled entirely** — that also kills the Actions "Run workflow" button; manual run =
+  `./scripts/run-local.sh`. All three streams verified end-to-end on the new timer and
+  owner-confirmed. #5 also closed today. Detail on both: `docs/HISTORY.md`.
+- #9 (external cron → workflow_dispatch, e.g. Cloudflare Worker) stays open as the dormant
+  fallback if alerts-while-the-Mac-sleeps ever matters.
+- **Rollout prep**: #8 onboarding guide is `ready-for-agent` (owner will say when), #7
+  test-card path and #6 self-comment filter await green-light (#6 explicitly liked).
+  Shareable architecture explainer artifact exists (link with owner) — note it describes
+  the GitHub-cron architecture and needs an update for the launchd model.
 
 ## Run / verify (do this first)
 
@@ -39,12 +38,14 @@ No test suite — verify = a real run with live creds, or `python -m py_compile 
 
 - Jira PAT **expires 2027-01-16** — the notifier goes silent until a new one is set (repo
   secret `JIRA_PAT`).
-- GitHub pauses the Actions cron after 60 days of zero repo activity; any commit resets it.
-- `state.json` is the app's dedup state (gitignored) — NOT related to STATE.md. Reset it to
-  `{"initialized": false, "seen": {}}` to re-trigger the silent seed.
+- `state.json` is the app's dedup state (gitignored, lives locally now) — NOT related to
+  STATE.md. Reset it to `{"initialized": false, "seen": {}}` to re-trigger the silent seed.
+- No alerts while the Mac sleeps. On wake, launchd runs a catch-up cycle: assignment diffs
+  recover fully; comments older than `LOOKBACK_MINUTES` (30) are dropped by design.
 - README's `cp .env.example .env` step is broken — `.env.example` doesn't exist yet (#4).
 - @mention detection depends on Jira DC text-index tokenization; degrades gracefully if the
   server rejects text search.
-- Actions cache evicts after ~7 idle days → next cloud run silently re-seeds; events during
-  the gap are dropped by design. Assignment alerts also never retry a failed send (the diff
-  advances regardless) — only comment alerts retry.
+- Assignment alerts never retry a failed send (the diff advances regardless) — only comment
+  alerts retry.
+- If ever reverting to the cloud cron (`gh workflow enable poll.yml`): its cached state is
+  stale → it will silently re-seed; GitHub also pauses crons after 60 idle days.

@@ -2,6 +2,30 @@
 
 *Created at convention adoption 2026-07-13. STATE.md is the thin quick-resume snapshot; per-feature detail accrues here as the owner accepts work. The work queue lives in GitHub Issues. v1 behavior, setup, and tradeoffs are documented in README.md.*
 
+## 2026-07-30 — Timer moved to launchd on the owner's Mac (#10, commit e30a86a)
+
+**What changed.** The polling timer is a macOS LaunchAgent
+(`~/Library/LaunchAgents/com.jiraalerts.poll.plist`, not in the repo): every 300 s it runs
+`scripts/run-local.sh`, which sources `.env` and runs one cycle; output appends to
+`~/Library/Logs/jiraalerts.log`. `ProcessType Background` keeps it at the lowest scheduling
+priority; the process lives ~15 s per tick and nothing stays resident. The GitHub workflow
+was disabled entirely (which also disables `workflow_dispatch`; manual run =
+`./scripts/run-local.sh`). Local `state.json` was reset for a silent re-seed at cutover.
+
+**Why.** After the cron was re-enabled post-outage, GitHub's scheduler delivered roughly
+one run per hour against a nominal twelve. Diagnostics cleared our side: workflow active,
+poll.yml passed actionlint, no queued or stuck runs, githubstatus.com clean. Moving the
+cron to off-peak minutes (`3-58/5`, c0218dd) produced zero scheduled runs in over an hour.
+Scheduled events are best-effort and deprioritized; a notifier whose comment lookback is
+30 minutes cannot tolerate hourly ticks (events age out of the window and are lost). The
+owner has no NAS (#3 closed), so local launchd won over cloud alternatives: no new
+credentials, no third-party service, punctual ticks. Accepted tradeoff: no alerts while
+the Mac sleeps. Fallback if that ever matters: #9 (external cron → workflow_dispatch).
+
+**Verification.** Seed run at load (silent, 42 assignments), second tick exactly 300 s
+later delivered two real comment cards, third tick delivered a real "Reassigned →
+Unassigned" card — all with no manual triggering, owner confirmed receipt in Teams.
+
 ## 2026-07-30 — Comment narrowing + per-cycle flood valve (#5, commit 50448a1)
 
 **What changed.** Comment alerts now fire only for tickets *currently assigned* to the
