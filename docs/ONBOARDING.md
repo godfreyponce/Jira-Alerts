@@ -1,6 +1,6 @@
 # Setting this up for yourself (fork-based)
 
-This walks you from zero to getting Jira alerts in your own Teams chat. You need a
+This walks you from zero → getting Jira alerts in your own Teams chat. You need a
 Jira Data Center account, Microsoft Teams with Power Automate, a GitHub account, and
 about 30 minutes. Nothing here requires Jira admin rights.
 
@@ -80,7 +80,7 @@ webhook, and a Power Automate flow you own turns that into an Adaptive Card DM.
    `TEAMS_WEBHOOK_URL`.
 
 Heads-up: the Teams notification for these cards always reads "Sent a card". That's a
-Microsoft limitation of the "Post card" action, not something the payload can change.
+Microsoft limitation of the "Post card" action, not something modifiable.
 
 ## 5. Configure and do a first run
 
@@ -107,8 +107,8 @@ The script is one polling cycle; something has to run it every 5 minutes. Two op
 
 ### Option A: a timer on your own machine (recommended)
 
-This is what the repo owner runs. We originally used GitHub's scheduler and it
-delivered roughly one run per hour against a nominal twelve — scheduled workflows are
+This is what the repo owner runs. I originally used GitHub's scheduler and it
+delivered roughly one run per hour against a nominal twelve, scheduled workflows are
 best-effort and get deprioritized. A local timer ticks on time.
 
 On a Mac, save this as `~/Library/LaunchAgents/com.jiraalerts.poll.plist`, replacing
@@ -150,7 +150,7 @@ so make sure zsh is installed):
 ```
 
 The tradeoff: no alerts while your machine is asleep or off. On wake, the next cycle
-catches up — assignment changes are recovered fully, comments older than 30 minutes
+catches up, assignment changes are recovered fully, comments older than 30 minutes
 (`LOOKBACK_MINUTES`) are dropped by design.
 
 ### Option B: GitHub Actions cron on your fork
