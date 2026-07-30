@@ -8,20 +8,17 @@ Repo: github.com/godfreyponce/Jira-Alerts (PUBLIC).
 *Thin snapshot — update continuously as work progresses. Per-feature detail: `docs/HISTORY.md`.
 Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 
-**Last updated: 2026-07-23**
+**Last updated: 2026-07-30**
 
 ## Now
 
-- **#5 built, awaiting owner acceptance**: comment alerts narrowed to currently-assigned
-  tickets only (was: ever-assigned/reporter/watcher — too noisy), plus `MAX_CARDS_PER_CYCLE`
-  flood valve (default 10; burst → one digest card, same card field contract, no flow change).
-- **Blocker: Microsoft Power Automate outage (2026-07-23)** — the flows runtime for UTD's
-  default environment hangs (flow-list API calls never return; webhook POSTs time out; other
-  environment endpoints return 200). Portal's "You don't have any flows" is a timeout
-  fallback, NOT proof the flow was deleted. Multiple public outage reports same day. Fix =
-  wait for Microsoft. When a webhook probe returns 202: verify the test card landed, then
-  `gh workflow enable jira-teams-notifier` + one dispatch (expect silent re-seed — caches
-  expired). Cron stays `disabled_manually` until then.
+- **Back online (2026-07-30)**: the Power Automate outage (2026-07-23 → ~07-30) resolved;
+  webhook probe returned 202, cron re-enabled, dispatch run silently re-seeded (1 comment,
+  41 assignments) and cache saved. Cron now live every 5 min.
+- **#5 awaiting owner acceptance**: comment alerts narrowed to currently-assigned tickets
+  only, plus `MAX_CARDS_PER_CYCLE` flood valve (default 10; burst → one digest card, same
+  card field contract, no flow change). Close #5 + write HISTORY.md entry once the owner
+  confirms the TEST card and a real card have landed in Teams.
 - 2026-07 throttle post-mortem: state.json was never committed and poll.yml was already
   cache-based; the ~42-card flood came from local runs, not the cron. No git-conflict
   failure mode exists.
