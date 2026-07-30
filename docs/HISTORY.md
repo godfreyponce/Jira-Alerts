@@ -2,6 +2,25 @@
 
 *Created at convention adoption 2026-07-13. STATE.md is the thin quick-resume snapshot; per-feature detail accrues here as the owner accepts work. The work queue lives in GitHub Issues. v1 behavior, setup, and tradeoffs are documented in README.md.*
 
+## 2026-07-30 — Rollout docs: tracked .env.example + fork onboarding guide (#4 + #8, commits 5feaff5 + 1744e6d)
+
+**What changed.** `.env.example` is now tracked, holding the five required vars with
+placeholder values only (the repo is public), so README's `cp .env.example .env` step
+finally works. `docs/ONBOARDING.md` is the from-scratch fork path for coworkers: PAT
+creation, user-key discovery via `/rest/api/2/myself`, the Power Automate flow build
+against the flat payload contract (with a starter card layout), local timer
+(launchd plist template / cron line) recommended over fork Actions — whose gotchas
+(cron lag, 60-day pause, ~7-day cache eviction → silent re-seed) are spelled out —
+plus known quirks (#6 self-comments, no-retry assignment sends, silent PAT expiry).
+
+**Notes.** Issue #8 predated the config change that derives `MENTION_TOKENS` from
+`JIRA_USERNAME`/`JIRA_USER_KEY`, so the guide documents those two values instead of a
+hand-picked token list. Writing the guide surfaced README drift (setup step 2's
+card-binding expression contradicts `cards.py`'s flat contract) → filed as #12.
+
+**Verification.** Docs-only, no code touched. Owner read the guide, edited voice
+directly on GitHub (ba832f6), and confirmed both items 2026-07-30.
+
 ## 2026-07-30 — Timer moved to launchd on the owner's Mac (#10, commit e30a86a)
 
 **What changed.** The polling timer is a macOS LaunchAgent

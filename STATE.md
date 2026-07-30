@@ -21,9 +21,9 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
   owner-confirmed. #5 also closed today. Detail on both: `docs/HISTORY.md`.
 - #9 (external cron → workflow_dispatch, e.g. Cloudflare Worker) stays open as the dormant
   fallback if alerts-while-the-Mac-sleeps ever matters.
-- **Rollout prep**: #4 (`.env.example`) and #8 (`docs/ONBOARDING.md`, fork-based guide)
-  are **built, awaiting owner confirmation** before closing. #7 test-card path and #6
-  self-comment filter await green-light (#6 explicitly liked). #11 filed: Teams toast
+- **Rollout prep**: #4 (`.env.example`) and #8 (`docs/ONBOARDING.md`) are **done and
+  closed** (owner confirmed 2026-07-30). Still open: #7 test-card path and #6
+  self-comment filter await green-light (#6 explicitly liked). #11: Teams toast
   always says "Sent a card" (Microsoft limitation); options written up, owner to pick.
   Shareable architecture explainer artifact exists (link with owner) — note it describes
   the GitHub-cron architecture and needs an update for the launchd model.
