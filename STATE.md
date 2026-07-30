@@ -21,10 +21,15 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
   owner-confirmed. #5 also closed today. Detail on both: `docs/HISTORY.md`.
 - #9 (external cron → workflow_dispatch, e.g. Cloudflare Worker) stays open as the dormant
   fallback if alerts-while-the-Mac-sleeps ever matters.
-- **Rollout prep**: #8 onboarding guide is `ready-for-agent` (owner will say when), #7
-  test-card path and #6 self-comment filter await green-light (#6 explicitly liked).
+- **Rollout prep**: #4 (`.env.example`) and #8 (`docs/ONBOARDING.md`, fork-based guide)
+  are **built, awaiting owner confirmation** before closing. #7 test-card path and #6
+  self-comment filter await green-light (#6 explicitly liked). #11 filed: Teams toast
+  always says "Sent a card" (Microsoft limitation); options written up, owner to pick.
   Shareable architecture explainer artifact exists (link with owner) — note it describes
   the GitHub-cron architecture and needs an update for the launchd model.
+- README drift: setup step 2 tells you to bind the card to
+  `triggerBody()?['attachments']?[0]?['content']`, but `cards.py` sends a flat payload
+  with the layout living in the flow (#12). README also still describes the GH-cron era.
 
 ## Run / verify (do this first)
 
@@ -42,7 +47,6 @@ No test suite — verify = a real run with live creds, or `python -m py_compile 
   STATE.md. Reset it to `{"initialized": false, "seen": {}}` to re-trigger the silent seed.
 - No alerts while the Mac sleeps. On wake, launchd runs a catch-up cycle: assignment diffs
   recover fully; comments older than `LOOKBACK_MINUTES` (30) are dropped by design.
-- README's `cp .env.example .env` step is broken — `.env.example` doesn't exist yet (#4).
 - @mention detection depends on Jira DC text-index tokenization; degrades gracefully if the
   server rejects text search.
 - Assignment alerts never retry a failed send (the diff advances regardless) — only comment
