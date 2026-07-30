@@ -23,9 +23,9 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
   fallback if alerts-while-the-Mac-sleeps ever matters.
 - **Rollout prep**: #4 (`.env.example`) and #8 (`docs/ONBOARDING.md`) are **done and
   closed** (owner confirmed 2026-07-30). Still open: #7 test-card path and #6
-  self-comment filter await green-light (#6 explicitly liked). #11: owner picked the
-  plain-message flow (real toast previews, drops the card layout); flow edit is
-  **mid-flight in Power Automate** — after owner confirms, update ONBOARDING §4 + close.
+  self-comment filter await green-light (#6 explicitly liked). #11 closed 2026-07-30:
+  flow now posts a plain message (banner previews the alert; card layout dropped) —
+  detail in `docs/HISTORY.md`.
   Shareable architecture explainer artifact exists (link with owner) — note it describes
   the GitHub-cron architecture and needs an update for the launchd model.
 - README drift: setup step 2 tells you to bind the card to

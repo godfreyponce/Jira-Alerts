@@ -45,17 +45,37 @@ tokens from these two values. Get either one wrong and mentions silently stop ma
 ## 4. Build the Power Automate flow
 
 The Python script does not talk to Teams directly. It POSTs a flat JSON payload to a
-webhook, and a Power Automate flow you own turns that into an Adaptive Card DM.
+webhook, and a Power Automate flow you own turns that into a Teams DM. The script
+always sends the same six fields — `ticket`, `summary`, `headline`, `subline`,
+`snippet`, `url` — so one flow covers every alert type.
 
 1. Go to [make.powerautomate.com](https://make.powerautomate.com) → **Create** →
    **Instant cloud flow** → skip → add the trigger
    **"When a Teams webhook request is received"**. Set *Who can trigger the flow* to
    **Anyone** (the URL itself is the secret — treat it like a password).
-2. Add the action **"Post card in a chat or channel"**. Post as **Flow bot**, post in
-   **Chat with Flow bot**, recipient: your own email.
-3. Paste a card layout into the **Adaptive Card** field. The script always sends the
-   same six fields — `ticket`, `summary`, `headline`, `subline`, `snippet`, `url` — so
-   one layout covers every alert type. Starting point:
+2. Add the action **"Post message in a chat or channel"**. Post as **Flow bot**, post
+   in **Chat with Flow bot**, recipient: your own email.
+3. In the **Message** box, switch to code view (the `</>` toggle) and paste:
+
+```html
+<p><strong>@{if(empty(triggerBody()?['headline']), triggerBody()?['subline'], triggerBody()?['headline'])}</strong> — <a href="@{triggerBody()?['url']}">@{triggerBody()?['ticket']}</a>: @{triggerBody()?['summary']}</p>
+<p>@{if(empty(triggerBody()?['headline']), '', triggerBody()?['subline'])}</p>
+<p>@{triggerBody()?['snippet']}</p>
+```
+
+   The notification banner previews the message's first words, so the first line leads
+   with `headline` ("Assigned to you", "You were mentioned", "Reassigned from you") and
+   falls back to `subline` ("Bob commented:") for plain comments, where `headline` is
+   empty. Banners come out like "Assigned to you — ABC-1234: Fix the login page".
+
+4. Save the flow and copy the **HTTP POST URL** from the trigger. That's your
+   `TEAMS_WEBHOOK_URL`.
+
+### Prefer the card look?
+
+Use the action **"Post card in a chat or channel"** instead, and paste an Adaptive
+Card layout into the **Adaptive Card** field, using the same
+`@{triggerBody()?['field']}` tokens:
 
 ```json
 {
@@ -76,11 +96,9 @@ webhook, and a Power Automate flow you own turns that into an Adaptive Card DM.
 }
 ```
 
-4. Save the flow and copy the **HTTP POST URL** from the trigger. That's your
-   `TEAMS_WEBHOOK_URL`.
-
-Heads-up: the Teams notification for these cards always reads "Sent a card". That's a
-Microsoft limitation of the "Post card" action, not something modifiable.
+The catch: card notifications always read "Sent a card" — a Microsoft limitation of
+the action, nothing you or the payload can change. That's why the plain message above
+is the default here.
 
 ## 5. Configure and do a first run
 

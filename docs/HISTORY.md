@@ -2,6 +2,25 @@
 
 *Created at convention adoption 2026-07-13. STATE.md is the thin quick-resume snapshot; per-feature detail accrues here as the owner accepts work. The work queue lives in GitHub Issues. v1 behavior, setup, and tradeoffs are documented in README.md.*
 
+## 2026-07-30 — Real notification previews: flow switched to plain message (#11)
+
+**What changed.** The Power Automate flow's action changed from "Post card in a chat
+or channel" to "Post message in a chat or channel" (flow-side only — no repo code, no
+webhook URL change). The message is HTML built from the same six payload fields; its
+first line is `headline` with an `if(empty(...))` fallback to `subline`, so the Teams
+notification banner now previews the actual alert ("Assigned to you — ABC-1234: …")
+instead of the hardcoded "Sent a card". Tradeoff accepted: no card layout / Open
+button; bold first line + hyperlink instead. ONBOARDING §4 now documents the
+plain-message flow as the default, with the Adaptive Card layout kept as a
+"prefer the card look?" alternative.
+
+**Why.** The toast for cards posted via the "Post card" action is hardcoded by
+Microsoft (open feature request: microsoft/AdaptiveCards#8647); the owner reads the
+banner, not the chat, so the preview text was the whole point.
+
+**Verification.** Test payload POSTed to the live webhook from the owner's Mac →
+HTTP 202 → owner confirmed the banner shows the test headline in Teams, 2026-07-30.
+
 ## 2026-07-30 — Rollout docs: tracked .env.example + fork onboarding guide (#4 + #8, commits 5feaff5 + 1744e6d)
 
 **What changed.** `.env.example` is now tracked, holding the five required vars with
