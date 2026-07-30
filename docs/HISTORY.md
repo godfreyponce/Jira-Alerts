@@ -2,6 +2,16 @@
 
 *Created at convention adoption 2026-07-13. STATE.md is the thin quick-resume snapshot; per-feature detail accrues here as the owner accepts work. The work queue lives in GitHub Issues. v1 behavior, setup, and tradeoffs are documented in README.md.*
 
+## 2026-07-30 — send-test.sh: verify the Teams flow without a real Jira event (#7, commit c3989d3)
+
+**What changed.** `scripts/send-test.sh` sources `.env` and POSTs a fake alert payload
+(`TEST-0000`, all six fields populated) to the Teams webhook, printing the HTTP status
+(expect 202). ONBOARDING step 5 now points first-time setups at it, so coworkers can
+verify their Power Automate flow before waiting on a real Jira event.
+
+**Verification.** Ran live against the owner's webhook: 202 returned, "Test alert"
+message received in Teams, owner confirmed 2026-07-30.
+
 ## 2026-07-30 — Real notification previews: flow switched to plain message (#11)
 
 **What changed.** The Power Automate flow's action changed from "Post card in a chat
@@ -9,8 +19,11 @@ or channel" to "Post message in a chat or channel" (flow-side only — no repo c
 webhook URL change). The message is HTML built from the same six payload fields; its
 first line is `headline` with an `if(empty(...))` fallback to `subline`, so the Teams
 notification banner now previews the actual alert ("Assigned to you — ABC-1234: …")
-instead of the hardcoded "Sent a card". Tradeoff accepted: no card layout / Open
-button; bold first line + hyperlink instead. ONBOARDING §4 now documents the
+instead of the hardcoded "Sent a card". Tradeoff accepted: no real card / Open
+button. The layout was then polished to mirror the old card (owner confirmed both
+shapes 2026-07-30): bold headline line, bold ticket-link — summary line, conditional
+subline/snippet paragraphs via `concat()` (so empty fields render no blank gaps), and
+an "Open <ticket>" hyperlink standing in for the button. ONBOARDING §4 documents the
 plain-message flow as the default, with the Adaptive Card layout kept as a
 "prefer the card look?" alternative.
 

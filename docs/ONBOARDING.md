@@ -58,15 +58,19 @@ always sends the same six fields — `ticket`, `summary`, `headline`, `subline`,
 3. In the **Message** box, switch to code view (the `</>` toggle) and paste:
 
 ```html
-<p><strong>@{if(empty(triggerBody()?['headline']), triggerBody()?['subline'], triggerBody()?['headline'])}</strong> — <a href="@{triggerBody()?['url']}">@{triggerBody()?['ticket']}</a>: @{triggerBody()?['summary']}</p>
-<p>@{if(empty(triggerBody()?['headline']), '', triggerBody()?['subline'])}</p>
-<p>@{triggerBody()?['snippet']}</p>
+<p><strong>@{if(empty(triggerBody()?['headline']), triggerBody()?['subline'], triggerBody()?['headline'])}</strong><br>
+<strong><a href="@{triggerBody()?['url']}">@{triggerBody()?['ticket']}</a> — @{triggerBody()?['summary']}</strong></p>
+@{if(empty(triggerBody()?['headline']), '', concat('<p><em>', triggerBody()?['subline'], '</em></p>'))}
+@{if(empty(triggerBody()?['snippet']), '', concat('<p>', triggerBody()?['snippet'], '</p>'))}
+<p><a href="@{triggerBody()?['url']}">Open @{triggerBody()?['ticket']}</a></p>
 ```
 
    The notification banner previews the message's first words, so the first line leads
    with `headline` ("Assigned to you", "You were mentioned", "Reassigned from you") and
    falls back to `subline` ("Bob commented:") for plain comments, where `headline` is
-   empty. Banners come out like "Assigned to you — ABC-1234: Fix the login page".
+   empty. The two `concat(...)` lines emit their paragraph only when the field has
+   content, so alerts without a snippet or subline don't render blank gaps. The final
+   line stands in for the card's Open button.
 
 4. Save the flow and copy the **HTTP POST URL** from the trigger. That's your
    `TEAMS_WEBHOOK_URL`.
