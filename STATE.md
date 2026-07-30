@@ -24,9 +24,10 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 - **Rollout prep**: #4 (`.env.example`), #8 (`docs/ONBOARDING.md`), #7
   (`scripts/send-test.sh`), and #11 all **done and closed** (owner confirmed
   2026-07-30). The flow now posts a plain message with a card-like layout — banner
-  previews the alert; detail in `docs/HISTORY.md`. Guide is coworker-ready; remaining
-  nice-to-haves: #6 self-comment filter (explicitly liked, awaits green-light),
-  #12 README refresh.
+  previews the alert; detail in `docs/HISTORY.md`. Guide is coworker-ready.
+- **Next up (green-lit 2026-07-30, `ready-for-agent`)**: #6 self-comment filter and
+  #12 README refresh (drop the stale card-binding step, describe the launchd-era
+  architecture; correct flow setup lives in `docs/ONBOARDING.md` §4).
   Shareable architecture explainer artifact exists (link with owner) — note it describes
   the GitHub-cron architecture and needs an update for the launchd model.
 - README drift: setup step 2 tells you to bind the card to
