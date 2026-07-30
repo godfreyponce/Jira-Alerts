@@ -19,11 +19,13 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
   assigned, and reassigned cards all delivered. Nothing mid-flight; queue is in Issues.
 - **Watch: offset cron (c0218dd)** moved the schedule to off-peak minutes (:03,:08,…) after
   scheduler lag left 20–30 min gaps. Awaiting the first scheduled runs at the new cadence;
-  an owner comment on an assigned ticket is pending as the hands-off verification. If lag
-  persists, #3 (NAS systemd timer) is the durable fix.
-- **Rollout prep queued**: #8 onboarding guide (+#4 .env.example), #7 test-card dispatch,
-  #6 self-comment filter — all awaiting owner green-light. Shareable architecture
-  explainer artifact exists (link with owner).
+  an owner comment on an assigned ticket is pending as the hands-off verification. (#3
+  NAS timer closed — no NAS exists; if lag persists, escalation = external cron pinger,
+  new issue.)
+- **Rollout prep**: #8 onboarding guide is `ready-for-agent` but work starts only AFTER
+  the hands-off verification above passes (owner's call, 2026-07-30). #7 test-card
+  dispatch and #6 self-comment filter await green-light (#6 explicitly liked). Shareable
+  architecture explainer artifact exists (link with owner).
 
 ## Run / verify (do this first)
 
