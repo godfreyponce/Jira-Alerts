@@ -12,12 +12,13 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 
 ## Now
 
-- **#5 closed 2026-07-30**: comment narrowing + flood valve accepted — owner confirmed the
-  TEST card and a real end-to-end "Assigned to you" card in Teams. Detail: `docs/HISTORY.md`.
-- **Watch: cron scheduler resume.** No schedule-triggered run since re-enable (last one
-  2026-06-30; today's runs were manual dispatches). The close-out push to main should
-  re-register the schedule — confirm a `schedule`-event run appears in
-  `gh run list --workflow=poll.yml` within ~30 min of the push; if not, that's a new issue.
+- **Fully live in production (2026-07-30)**: #5 closed (comment narrowing + flood valve
+  accepted; detail in `docs/HISTORY.md`). The scheduler resumed after the close-out push
+  (it had been dormant since 06-30 — a push to main was indeed the fix), and the first
+  scheduled run at 16:01 UTC verified all three alert streams in one cycle: comment,
+  assigned, and reassigned cards all delivered. Nothing mid-flight; queue is in Issues.
+- Cron ticks can lag GitHub's `*/5` schedule by several minutes under load — an irregular
+  cadence is normal, not a failure.
 
 ## Run / verify (do this first)
 
