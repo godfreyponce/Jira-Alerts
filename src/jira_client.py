@@ -12,6 +12,9 @@ For every matched issue we pull recent comments and classify each one. A comment
 is relevant if it's on a currently-assigned issue OR its body contains a mention
 marker. Tickets you merely watch, reported, or were once assigned to do NOT
 trigger comment alerts (they proved too noisy).
+
+Comments you authored yourself are always skipped — you don't need a DM
+about your own words.
 """
 
 import re
@@ -119,6 +122,12 @@ def collect_relevant_comments() -> List[RelevantComment]:
         summary = issue.get("fields", {}).get("summary", "") or "(no summary)"
         on_assigned_issue = key in assigned_issues
         for c in _comments(key):
+            author = c.get("author", {}) or {}
+            if (
+                author.get("name") == config.JIRA_USERNAME
+                or author.get("key") == config.JIRA_USER_KEY
+            ):
+                continue  # your own comments are noise, not news (#6)
             body = c.get("body", "") or ""
             mentions = _mentions_me(body)
             if not (on_assigned_issue or mentions):

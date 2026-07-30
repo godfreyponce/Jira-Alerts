@@ -213,8 +213,6 @@ Know what you're signing up for:
 
 ## Known quirks
 
-- Comments **you** write on your own tickets currently alert you too (a filter is
-  planned, tracked in issue #6).
 - Assignment alerts fire once and never retry a failed send; comment alerts do retry.
 - When the PAT expires, everything goes quiet with no warning. Set a calendar
   reminder for the expiry date you wrote down in step 2.
