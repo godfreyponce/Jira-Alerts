@@ -17,8 +17,13 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
   (it had been dormant since 06-30 — a push to main was indeed the fix), and the first
   scheduled run at 16:01 UTC verified all three alert streams in one cycle: comment,
   assigned, and reassigned cards all delivered. Nothing mid-flight; queue is in Issues.
-- Cron ticks can lag GitHub's `*/5` schedule by several minutes under load — an irregular
-  cadence is normal, not a failure.
+- **Watch: offset cron (c0218dd)** moved the schedule to off-peak minutes (:03,:08,…) after
+  scheduler lag left 20–30 min gaps. Awaiting the first scheduled runs at the new cadence;
+  an owner comment on an assigned ticket is pending as the hands-off verification. If lag
+  persists, #3 (NAS systemd timer) is the durable fix.
+- **Rollout prep queued**: #8 onboarding guide (+#4 .env.example), #7 test-card dispatch,
+  #6 self-comment filter — all awaiting owner green-light. Shareable architecture
+  explainer artifact exists (link with owner).
 
 ## Run / verify (do this first)
 
