@@ -2,7 +2,8 @@ name: jira-teams-notifier
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # every 5 minutes (UTC). GitHub may delay under load.
+    - cron: "3-58/5 * * * *"   # every 5 min at :03,:08,:13... — off-peak minutes get
+                               # scheduled far more reliably than the contended */5 slots.
   workflow_dispatch: {}      # lets you run it manually from the Actions tab
 
 # Prevent two scheduled runs from racing on the state.json cache.
