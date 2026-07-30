@@ -6,8 +6,8 @@ contract is shared by all three alert kinds so the flow card never changes:
 
     ticket       - issue key (clickable + Open button)
     summary      - issue summary
-    headline     - accent line: "You were mentioned" / "Assigned to you" /
-                   "Reassigned from you" / "" (empty for plain comments)
+    headline     - accent line: "You were mentioned" / "Tag, you're it" /
+                   "Not yours anymore :)" / "" (empty for plain comments)
     subline      - the line under the header (e.g. "Bob commented:",
                    "Now on your plate", "Now assigned to: Jane")
     snippet      - comment text (empty for assignment events)
@@ -63,7 +63,7 @@ def assigned_payload(ticket: str, summary: str, url: str) -> dict:
     return _payload(
         ticket=ticket,
         summary=summary,
-        headline="Assigned to you",
+        headline="Tag, you're it",
         subline="This ticket is now on your plate",
         snippet="",
         url=url,
@@ -102,7 +102,7 @@ def reassigned_payload(ticket: str, summary: str, url: str, new_assignee) -> dic
     return _payload(
         ticket=ticket,
         summary=summary,
-        headline="Reassigned from you",
+        headline="Not yours anymore :)",
         subline=f"Now assigned to: {who}",
         snippet="",
         url=url,

@@ -58,22 +58,33 @@ always sends the same six fields — `ticket`, `summary`, `headline`, `subline`,
 3. In the **Message** box, switch to code view (the `</>` toggle) and paste:
 
 ```html
-<p><strong>@{if(empty(triggerBody()?['headline']), triggerBody()?['subline'], triggerBody()?['headline'])}</strong><br>
-<strong><a href="@{triggerBody()?['url']}">@{triggerBody()?['ticket']}</a> — @{triggerBody()?['summary']}</strong></p>
-@{if(empty(triggerBody()?['headline']), '', concat('<p><em>', triggerBody()?['subline'], '</em></p>'))}
+@{if(empty(triggerBody()?['headline']), '', concat('<p><strong>', triggerBody()?['headline'], '</strong></p>'))}
+<p><strong>@{triggerBody()?['ticket']} — @{triggerBody()?['summary']}</strong></p>
+@{if(empty(triggerBody()?['subline']), '', concat('<p><strong>', triggerBody()?['subline'], '</strong></p>'))}
 @{if(empty(triggerBody()?['snippet']), '', concat('<p>', triggerBody()?['snippet'], '</p>'))}
-<p><a href="@{triggerBody()?['url']}">Open @{triggerBody()?['ticket']}</a></p>
+<p><a href="@{triggerBody()?['url']}">Open Ticket #@{last(split(triggerBody()?['ticket'], '-'))}</a></p>
 ```
 
-   The notification banner previews the message's first words, so the first line leads
-   with `headline` ("Assigned to you", "You were mentioned", "Reassigned from you") and
-   falls back to `subline` ("Bob commented:") for plain comments, where `headline` is
-   empty. The two `concat(...)` lines emit their paragraph only when the field has
-   content, so alerts without a snippet or subline don't render blank gaps. The final
-   line stands in for the card's Open button.
+   The notification banner previews the message's first words, so alerts with a
+   `headline` (assignments, mentions, reassignments) lead with it, and plain comments
+   lead with the ticket line. The `concat(...)` lines emit their paragraph only when
+   the field has content, so empty fields don't render blank gaps. The last line is
+   the message's only hyperlink, standing in for the card's Open button.
 
 4. Save the flow and copy the **HTTP POST URL** from the trigger. That's your
    `TEAMS_WEBHOOK_URL`.
+
+### Make the wording your own
+
+The text and the layout live in different places:
+
+- **What the alerts say** — the headlines and sublines are plain strings in
+  `src/cards.py` (`comment_payload`, `assigned_payload`, `reassigned_payload`).
+  This repo ships with "Tag, you're it" for new assignments and
+  "Not yours anymore :)" for reassignments; edit those strings to taste. No flow
+  changes needed — the flow just displays whatever the script sends.
+- **How the message looks** — the HTML you pasted in step 3. Edit it in the flow;
+  the script never needs to change.
 
 ### Prefer the card look?
 
