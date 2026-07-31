@@ -33,8 +33,10 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 - **#13 done and closed (owner confirmed 2026-07-31)**: the `RelevantComment`
   construction site reuses the comment loop's `author` var — duplicated lookup gone,
   latent null-author crash gone. Noted in the #6 entry in `docs/HISTORY.md`.
-- Shareable architecture explainer artifact still describes the GitHub-cron model —
-  update tracked as #14 (needs the owner to supply the artifact link).
+- **#14 built, awaiting owner confirmation (2026-07-31)**: the "How JiraAlerts works"
+  explainer artifact was rewritten for the launchd model (local timer, plain card-like
+  Teams message, .env + local-timer setup steps; same URL and visual design). On
+  confirmation: close #14.
 
 ## Run / verify (do this first)
 
