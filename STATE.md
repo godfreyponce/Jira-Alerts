@@ -9,7 +9,7 @@ Repo: github.com/godfreyponce/Jira-Alerts (PUBLIC).
 *Thin snapshot — update continuously as work progresses. Per-feature detail: `docs/HISTORY.md`.
 Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 
-**Last updated: 2026-07-30**
+**Last updated: 2026-07-31**
 
 ## Now
 
@@ -29,11 +29,13 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 - **#6 and #12 done and closed (owner confirmed 2026-07-30)**: comments you author
   yourself no longer alert, and the README is now a launchd-era overview that delegates
   all setup to `docs/ONBOARDING.md` (the stale card-binding step is gone). Detail:
-  `docs/HISTORY.md`. Review follow-up filed as #13 (minor author-var cleanup in
-  `jira_client.py`, not green-lit).
+  `docs/HISTORY.md`.
+- **#13 built, awaiting owner confirmation (2026-07-31)**: the `RelevantComment`
+  construction site now reuses the comment loop's `author` var, killing the duplicated
+  lookup and the latent crash on a null comment author. Verified via `py_compile`.
+  On confirmation: close #13 and note it in the #6 HISTORY entry.
 - Shareable architecture explainer artifact still describes the GitHub-cron model —
-  update tracked as #14 (needs the owner to supply the artifact link). #13 (minor
-  author-var cleanup) is `ready-for-agent`.
+  update tracked as #14 (needs the owner to supply the artifact link).
 
 ## Run / verify (do this first)
 

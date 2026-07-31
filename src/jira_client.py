@@ -137,7 +137,7 @@ def collect_relevant_comments() -> List[RelevantComment]:
                     issue_key=key,
                     issue_summary=summary,
                     comment_id=str(c["id"]),
-                    author=c.get("author", {}).get("displayName", "Unknown"),
+                    author=author.get("displayName", "Unknown"),
                     body=body,
                     created=c.get("created", ""),
                     mentions_me=mentions,
