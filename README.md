@@ -42,10 +42,7 @@ against the last cycle's, so a missed run never loses an assignment change.
 <p align="center"><img src="docs/media/banner-notyours.png" alt="Banner: Not yours anymore :) RustConversion-4923, now assigned to Jane Doe" width="520"></p>
 <p align="center"><sub><samp>jane doe's problem now.</samp></sub></p>
 
-<!-- demo clip: GitHub renders inline video players only from uploaded
-     attachment URLs. At PR review, drag docs/media/jira-alerts-demo.mp4 into
-     the web editor here and replace the link below with the minted URL. -->
-<p align="center"><a href="docs/media/jira-alerts-demo.mp4">watch all three, back to back (13 s)</a></p>
+https://github.com/user-attachments/assets/4fbbbf7b-04a3-4305-a98f-e6482184a7be
 <p align="center"><sub><samp>the entire user interface. there is no screen two.</samp></sub></p>
 
 ## how it works
