@@ -30,10 +30,9 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
   yourself no longer alert, and the README is now a launchd-era overview that delegates
   all setup to `docs/ONBOARDING.md` (the stale card-binding step is gone). Detail:
   `docs/HISTORY.md`.
-- **#13 built, awaiting owner confirmation (2026-07-31)**: the `RelevantComment`
-  construction site now reuses the comment loop's `author` var, killing the duplicated
-  lookup and the latent crash on a null comment author. Verified via `py_compile`.
-  On confirmation: close #13 and note it in the #6 HISTORY entry.
+- **#13 done and closed (owner confirmed 2026-07-31)**: the `RelevantComment`
+  construction site reuses the comment loop's `author` var — duplicated lookup gone,
+  latent null-author crash gone. Noted in the #6 entry in `docs/HISTORY.md`.
 - Shareable architecture explainer artifact still describes the GitHub-cron model —
   update tracked as #14 (needs the owner to supply the artifact link).
 

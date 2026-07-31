@@ -11,8 +11,9 @@ Decided tradeoff: no escape hatch (an `ALERT_ON_SELF` env var was considered and
 rejected), which retires self-commenting as the one-person end-to-end test —
 `send-test.sh` covers the Teams half; the full pipeline needs a real event. The
 "self-comments alert you" known-quirk bullet was removed from ONBOARDING (the #8 entry
-below still lists it as it stood then). Review follow-up: #13 (reuse the new `author`
-var at the `RelevantComment` construction site; fixes a latent crash on a null author).
+below still lists it as it stood then). Review follow-up #13 (reuse the new `author`
+var at the `RelevantComment` construction site; fixes a latent crash on a null author)
+landed 2026-07-31 in commit 2c1cb09 and closed.
 
 **What changed (#12).** README rewritten as a launchd-era overview: what it is, updated
 flow diagram, run/verify basics, tradeoffs (including the why-not-Actions story) — with
