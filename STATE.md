@@ -31,8 +31,9 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
   all setup to `docs/ONBOARDING.md` (the stale card-binding step is gone). Detail:
   `docs/HISTORY.md`. Review follow-up filed as #13 (minor author-var cleanup in
   `jira_client.py`, not green-lit).
-- Shareable architecture explainer artifact exists (link with owner) — note it describes
-  the GitHub-cron architecture and needs an update for the launchd model.
+- Shareable architecture explainer artifact still describes the GitHub-cron model —
+  update tracked as #14 (needs the owner to supply the artifact link). #13 (minor
+  author-var cleanup) is `ready-for-agent`.
 
 ## Run / verify (do this first)
 
