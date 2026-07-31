@@ -8,8 +8,8 @@ code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$TEAMS_WEBHOOK_URL" \
   -d '{
     "ticket": "TEST-0000",
     "summary": "Webhook test (safe to ignore)",
-    "headline": "Test alert",
-    "subline": "Sent by scripts/send-test.sh",
+    "headline": "send-test.sh pinged you on TEST-0000:",
+    "subline": "Sent by scripts/send-test.sh.",
     "snippet": "If you can read this in Teams, your flow works.",
     "url": "https://example.com"
   }')
