@@ -2,6 +2,50 @@
 
 *Created at convention adoption 2026-07-13. STATE.md is the thin quick-resume snapshot; per-feature detail accrues here as the owner accepts work. The work queue lives in GitHub Issues. v1 behavior, setup, and tradeoffs are documented in README.md.*
 
+## 2026-07-31 — Teams toast formatting: headline as lead sentence (#15)
+
+**What changed (repo side, `src/cards.py`).** `headline` is now a complete sentence that
+names the ticket and ends in terminal punctuation, and it carries what `subline` used to
+say. Comments read `Doe, John commented on ABC-1:` (`mentioned you on` when it's an
+@mention) with an empty `subline`; assignments read `Tag, you're it — ABC-1.` and drop
+their `subline` entirely, since "This ticket is now on your plate" said nothing the
+headline didn't and cost a line of the four-line banner budget; reassignments read
+`Not yours anymore :) ABC-1.` plus `Now assigned to Jane.`, with `Now unassigned.` as its
+own wording instead of the old "Now assigned to: Unassigned"; the digest gained terminal
+periods. `_payload` now sanitizes `headline` too (it interpolates a Jira-supplied author
+name), and the inline `_sanitize(c.author)` went. The six-field contract is unchanged, so
+`src/run.py`, `src/notifier.py`, and `src/jira_client.py` were untouched.
+
+**What changed (owner side, the Power Automate flow).** The summary moved from position 2
+to position 4, and the `@{ticket} — ` prefix came off it because the headline names the
+ticket now. Docs carrying that HTML were updated to match: ONBOARDING §4 (the block, the
+paragraph under it, and the Adaptive Card body), the README layout line, and the
+`cards.py` module docstring.
+
+**Why.** The macOS banner is the chat message flattened — HTML stripped, first ~4 lines
+kept — and there is no separate notification field, so wording, order, and punctuation are
+the only levers. A long summary sitting in position 2 pushed the comment text out of the
+banner completely. Full reasoning:
+`docs/superpowers/specs/2026-07-31-toast-formatting-design.md`; plan:
+`docs/superpowers/plans/2026-07-31-issue-15.md`.
+
+**Verification.** `py_compile` clean. A payload dump across all six alert shapes matched
+the design's strings character for character, including the sanitizer proof — an author
+name containing double quotes renders as `'Bobby'`. A live `python3 -m src.run` cycle ran
+clean but quiet (0 notifications), so it proved the code runs, not the wording. After the
+owner applied the flow edit: `send-test.sh` returned 202 and the banner showed the new
+order, then assigned / reassigned / mention payloads generated from `cards.py` were fired
+live and confirmed in macOS notifications by the owner.
+
+**Accepted limits.** The Open link cannot be given its own banner line — the toast flattens
+all HTML, so no markup lever exists; the owner accepted this at close. No summary length
+cap or truncation (explicitly passed on). The digest's `Open Ticket #Digest` link is still
+broken, pre-existing and out of scope.
+
+**Process note.** First ticket built under the `AGENTS.md` two-session protocol
+(`/plan-ticket` → `/clear` → `/build-ticket`) and the first to use a ticket branch,
+`ticket/15-toast-formatting`, with one commit per task.
+
 ## 2026-07-31 — Explainer artifact rewritten for the launchd model (#14)
 
 The shareable "How JiraAlerts works" artifact (link is with the owner; findable via the
