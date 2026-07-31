@@ -13,30 +13,19 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 
 ## Now
 
-- **Timer is launchd on the owner's Mac (2026-07-30, #10 closed)**: GitHub's scheduler
-  delivered ~1 run/hour vs a nominal 12 despite healthy config, so the cron moved local.
-  LaunchAgent `com.jiraalerts.poll` runs `scripts/run-local.sh` every 300 s
-  (ProcessType Background); log: `~/Library/Logs/jiraalerts.log`. Cloud workflow is
-  **disabled entirely** — that also kills the Actions "Run workflow" button; manual run =
-  `./scripts/run-local.sh`. All three streams verified end-to-end on the new timer and
-  owner-confirmed. #5 also closed today. Detail on both: `docs/HISTORY.md`.
-- #9 (external cron → workflow_dispatch, e.g. Cloudflare Worker) stays open as the dormant
-  fallback if alerts-while-the-Mac-sleeps ever matters.
-- **Rollout prep**: #4 (`.env.example`), #8 (`docs/ONBOARDING.md`), #7
-  (`scripts/send-test.sh`), and #11 all **done and closed** (owner confirmed
-  2026-07-30). The flow now posts a plain message with a card-like layout — banner
-  previews the alert; detail in `docs/HISTORY.md`. Guide is coworker-ready.
-- **#6 and #12 done and closed (owner confirmed 2026-07-30)**: comments you author
-  yourself no longer alert, and the README is now a launchd-era overview that delegates
-  all setup to `docs/ONBOARDING.md` (the stale card-binding step is gone). Detail:
-  `docs/HISTORY.md`.
-- **#13 done and closed (owner confirmed 2026-07-31)**: the `RelevantComment`
-  construction site reuses the comment loop's `author` var — duplicated lookup gone,
-  latent null-author crash gone. Noted in the #6 entry in `docs/HISTORY.md`.
-- **#14 done and closed (owner confirmed 2026-07-31)**: the "How JiraAlerts works"
-  explainer artifact now describes the launchd model (same URL and visual design;
-  dark-mode background bug also fixed). Detail: `docs/HISTORY.md`. Queue is now just
-  #9, the dormant cloud-fallback contingency.
+- **Nothing mid-flight; queue is empty except #9** (external cron → `workflow_dispatch`,
+  e.g. Cloudflare Worker) — dormant fallback if alerts-while-the-Mac-sleeps ever
+  matters. Don't start it without owner green-light.
+- **Timer is launchd on the owner's Mac (2026-07-30, #10)**: GitHub's scheduler was
+  delivering ~1 run/hour vs a nominal 12, so the cron moved local. LaunchAgent
+  `com.jiraalerts.poll` runs `scripts/run-local.sh` every 300 s; log:
+  `~/Library/Logs/jiraalerts.log`. Cloud workflow **disabled entirely** (no Actions
+  "Run workflow" button); manual run = `./scripts/run-local.sh`.
+- **Onboarding-ready, all owner-confirmed**: #4–#8, #10–#14 closed — `.env.example`,
+  `docs/ONBOARDING.md`, `send-test.sh`, plain card-like Teams message, self-comment
+  filter, launchd-era README, author-var cleanup, and the "How JiraAlerts works"
+  explainer artifact (rewritten for the launchd model, dark-mode bug fixed).
+  Per-feature detail: `docs/HISTORY.md`.
 
 ## Run / verify (do this first)
 
@@ -48,8 +37,9 @@ No test suite — verify = a real run with live creds, or `python -m py_compile 
 
 ## Gotchas (short form)
 
-- Jira PAT **expires 2027-01-16** — the notifier goes silent until a new one is set (repo
-  secret `JIRA_PAT`).
+- Jira PAT **expires 2027-01-16** — the notifier goes silent until a new one is set in
+  the local `.env` (`JIRA_PAT`; also the Actions repo secret if the cloud fallback is
+  ever revived).
 - `state.json` is the app's dedup state (gitignored, lives locally now) — NOT related to
   STATE.md. Reset it to `{"initialized": false, "seen": {}}` to re-trigger the silent seed.
 - No alerts while the Mac sleeps. On wake, launchd runs a catch-up cycle: assignment diffs
