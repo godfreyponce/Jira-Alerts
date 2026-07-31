@@ -1,20 +1,21 @@
 """Builds the flat data payloads sent to the Teams Workflows webhook.
 
-The Adaptive Card LAYOUT lives in the Power Automate flow as a literal card with
-@{triggerBody()?['field']} tokens. This script only sends the *data*. The field
-contract is shared by all three alert kinds so the flow card never changes:
+The message LAYOUT lives in the Power Automate flow, which drops
+@{triggerBody()?['field']} tokens into HTML. This script only sends the *data*.
+Every alert kind shares one field contract so the flow never changes:
 
-    ticket       - issue key (clickable + Open button)
-    summary      - issue summary
-    headline     - accent line: "You were mentioned" / "Tag, you're it" /
-                   "Not yours anymore :)" / "" (empty for plain comments)
-    subline      - the line under the header (e.g. "Bob commented:",
-                   "Now on your plate", "Now assigned to: Jane")
-    snippet      - comment text (empty for assignment events)
-    url          - link to the ticket / focused comment
+    ticket    - issue key (the flow's Open link splits it)
+    summary   - issue summary; rendered LAST, as context
+    headline  - the lead sentence: names the ticket, ends in terminal punctuation
+                ("Bob commented on ABC-1:", "Tag, you're it — ABC-1.")
+    subline   - optional second sentence ("Now assigned to Jane.")
+    snippet   - comment text (empty for assignment events)
+    url       - link to the ticket / focused comment
 
-NOTE: 'headline' and 'subline' replace the old 'mentionLine'/'author' field
-names. Update the flow card tokens to match (see README).
+The macOS toast is this message flattened - HTML stripped, first ~4 lines kept -
+so structure has to come from wording and punctuation, not markup. That's why the
+headline carries the news and the summary comes last. Full reasoning:
+docs/superpowers/specs/2026-07-31-toast-formatting-design.md
 
 Interpolated values are sanitized (no quotes/backslashes/control chars) so they
 can't break the card JSON when the flow drops them into a string literal.
@@ -39,7 +40,7 @@ def _payload(ticket, summary, headline, subline, snippet, url) -> dict:
     return {
         "ticket": ticket,
         "summary": _sanitize(summary) or "(no summary)",
-        "headline": headline,
+        "headline": _sanitize(headline),
         "subline": _sanitize(subline),
         "snippet": _sanitize(snippet),
         "url": url,
@@ -48,12 +49,12 @@ def _payload(ticket, summary, headline, subline, snippet, url) -> dict:
 
 def comment_payload(c: RelevantComment) -> dict:
     snippet = _sanitize(clean_snippet(c.body, config.SNIPPET_CHARS)) or "(no text body)"
-    headline = "You were mentioned" if c.mentions_me else ""
+    verb = "mentioned you on" if c.mentions_me else "commented on"
     return _payload(
         ticket=c.issue_key,
         summary=c.issue_summary,
-        headline=headline,
-        subline=f"{_sanitize(c.author)} commented:",
+        headline=f"{c.author} {verb} {c.issue_key}:",
+        subline="",
         snippet=snippet,
         url=c.url,
     )
@@ -63,8 +64,8 @@ def assigned_payload(ticket: str, summary: str, url: str) -> dict:
     return _payload(
         ticket=ticket,
         summary=summary,
-        headline="Tag, you're it",
-        subline="This ticket is now on your plate",
+        headline=f"Tag, you're it — {ticket}.",
+        subline="",
         snippet="",
         url=url,
     )
@@ -87,8 +88,8 @@ def digest_payload(n_comments: int, n_assigned: int, n_reassigned: int) -> dict:
     return _payload(
         ticket="Digest",
         summary=f"{total} Jira updates this cycle",
-        headline="Update burst",
-        subline=", ".join(parts),
+        headline="Update burst.",
+        subline=", ".join(parts) + ".",
         snippet=(
             f"More than {config.MAX_CARDS_PER_CYCLE} alerts in one cycle were "
             "collapsed into this digest to avoid webhook throttling."
@@ -98,12 +99,12 @@ def digest_payload(n_comments: int, n_assigned: int, n_reassigned: int) -> dict:
 
 
 def reassigned_payload(ticket: str, summary: str, url: str, new_assignee) -> dict:
-    who = new_assignee or "Unassigned"
+    subline = f"Now assigned to {new_assignee}." if new_assignee else "Now unassigned."
     return _payload(
         ticket=ticket,
         summary=summary,
-        headline="Not yours anymore :)",
-        subline=f"Now assigned to: {who}",
+        headline=f"Not yours anymore :) {ticket}.",
+        subline=subline,
         snippet="",
         url=url,
     )
