@@ -33,10 +33,10 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 - **#13 done and closed (owner confirmed 2026-07-31)**: the `RelevantComment`
   construction site reuses the comment loop's `author` var — duplicated lookup gone,
   latent null-author crash gone. Noted in the #6 entry in `docs/HISTORY.md`.
-- **#14 built, awaiting owner confirmation (2026-07-31)**: the "How JiraAlerts works"
-  explainer artifact was rewritten for the launchd model (local timer, plain card-like
-  Teams message, .env + local-timer setup steps; same URL and visual design). On
-  confirmation: close #14.
+- **#14 done and closed (owner confirmed 2026-07-31)**: the "How JiraAlerts works"
+  explainer artifact now describes the launchd model (same URL and visual design;
+  dark-mode background bug also fixed). Detail: `docs/HISTORY.md`. Queue is now just
+  #9, the dormant cloud-fallback contingency.
 
 ## Run / verify (do this first)
 

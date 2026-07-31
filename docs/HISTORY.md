@@ -2,6 +2,20 @@
 
 *Created at convention adoption 2026-07-13. STATE.md is the thin quick-resume snapshot; per-feature detail accrues here as the owner accepts work. The work queue lives in GitHub Issues. v1 behavior, setup, and tradeoffs are documented in README.md.*
 
+## 2026-07-31 — Explainer artifact rewritten for the launchd model (#14)
+
+The shareable "How JiraAlerts works" artifact (link is with the owner; findable via the
+Artifact list as "How JiraAlerts works") was rewritten in place — same URL, same visual
+design. Content changes: pipeline stage 1 is now the launchd LaunchAgent instead of a
+GitHub Actions runner; `state.json` described as a local file; the Teams stage is the
+flat six-field payload → Power Automate flow → plain card-like message (#11); the
+self-comment skip (#6) is mentioned; the timing bar dropped the GitHub-scheduler-lag
+column and gained the sleep/catch-up tradeoff note; setup steps now mirror
+ONBOARDING (.env, `send-test.sh`, local timer, Actions cron as fallback). Also fixed a
+pre-existing dark-mode bug: the page set its ground color only on `html`, so in dark
+theme the platform's light body background showed through under near-white text —
+background now also set on `body`.
+
 ## 2026-07-30 — Self-comment filter + README refresh (#6 + #12, commits ec51a57 + 2cd6c72)
 
 **What changed (#6).** `collect_relevant_comments()` now skips any comment whose author
