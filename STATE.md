@@ -1,8 +1,9 @@
 # JiraAlerts — Project State
 
-Jira → Teams notifier. Python 3.12 + `requests`. A GitHub Actions cron polls Jira Data
-Center every 5 min (`python -m src.run`) and DMs the owner in Microsoft Teams (Adaptive
-Card via Power Automate webhook) on new comments, @mentions, and assignment changes.
+Jira → Teams notifier. Python 3.12 + `requests`. A launchd timer on the owner's Mac
+polls Jira Data Center every 5 min (`scripts/run-local.sh` → `python -m src.run`) and
+DMs the owner in Microsoft Teams (plain message, card-like layout, via a Power Automate
+webhook) on new comments, @mentions, and assignment changes.
 Repo: github.com/godfreyponce/Jira-Alerts (PUBLIC).
 
 *Thin snapshot — update continuously as work progresses. Per-feature detail: `docs/HISTORY.md`.
@@ -25,14 +26,13 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
   (`scripts/send-test.sh`), and #11 all **done and closed** (owner confirmed
   2026-07-30). The flow now posts a plain message with a card-like layout — banner
   previews the alert; detail in `docs/HISTORY.md`. Guide is coworker-ready.
-- **Next up (green-lit 2026-07-30, `ready-for-agent`)**: #6 self-comment filter and
-  #12 README refresh (drop the stale card-binding step, describe the launchd-era
-  architecture; correct flow setup lives in `docs/ONBOARDING.md` §4).
-  Shareable architecture explainer artifact exists (link with owner) — note it describes
+- **#6 and #12 done and closed (owner confirmed 2026-07-30)**: comments you author
+  yourself no longer alert, and the README is now a launchd-era overview that delegates
+  all setup to `docs/ONBOARDING.md` (the stale card-binding step is gone). Detail:
+  `docs/HISTORY.md`. Review follow-up filed as #13 (minor author-var cleanup in
+  `jira_client.py`, not green-lit).
+- Shareable architecture explainer artifact exists (link with owner) — note it describes
   the GitHub-cron architecture and needs an update for the launchd model.
-- README drift: setup step 2 tells you to bind the card to
-  `triggerBody()?['attachments']?[0]?['content']`, but `cards.py` sends a flat payload
-  with the layout living in the flow (#12). README also still describes the GH-cron era.
 
 ## Run / verify (do this first)
 

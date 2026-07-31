@@ -2,6 +2,30 @@
 
 *Created at convention adoption 2026-07-13. STATE.md is the thin quick-resume snapshot; per-feature detail accrues here as the owner accepts work. The work queue lives in GitHub Issues. v1 behavior, setup, and tradeoffs are documented in README.md.*
 
+## 2026-07-30 — Self-comment filter + README refresh (#6 + #12, commits ec51a57 + 2cd6c72)
+
+**What changed (#6).** `collect_relevant_comments()` now skips any comment whose author
+matches `JIRA_USERNAME` or `JIRA_USER_KEY` — the same identity check the assignment diff
+uses. The guard sits before the mention check, so a self-@mention is skipped too.
+Decided tradeoff: no escape hatch (an `ALERT_ON_SELF` env var was considered and
+rejected), which retires self-commenting as the one-person end-to-end test —
+`send-test.sh` covers the Teams half; the full pipeline needs a real event. The
+"self-comments alert you" known-quirk bullet was removed from ONBOARDING (the #8 entry
+below still lists it as it stood then). Review follow-up: #13 (reuse the new `author`
+var at the `RelevantComment` construction site; fixes a latent crash on a null author).
+
+**What changed (#12).** README rewritten as a launchd-era overview: what it is, updated
+flow diagram, run/verify basics, tradeoffs (including the why-not-Actions story) — with
+all setup delegated to `docs/ONBOARDING.md`, so setup instructions now live in exactly
+one file. Dropped: the card-binding step that contradicted `cards.py`'s flat payload
+(the drift that spawned this issue), GH-repo/Actions setup, and the trailing
+workflow-editor URL and PAT-expiry stubs (operational detail that didn't belong in a
+public README).
+
+**Verification.** `py_compile` + import clean; README claims checked against source
+(payload fields, env var names, JQL, 300 s interval) during review. Live check on the
+launchd timer: owner confirmed 2026-07-30.
+
 ## 2026-07-30 — send-test.sh: verify the Teams flow without a real Jira event (#7, commit c3989d3)
 
 **What changed.** `scripts/send-test.sh` sources `.env` and POSTs a fake alert payload
