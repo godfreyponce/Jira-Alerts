@@ -1,77 +1,103 @@
-# jira-teams-notifier
+<p align="center"><img src="docs/media/banner-tag.png" alt="macOS notification banner from Teams: Tag, you're it, RustConversion-4923" width="600"></p>
 
-Polls **Jira Data Center** every 5 minutes and DMs you in **Microsoft Teams** when
-someone comments on a ticket assigned to you, @mentions you anywhere, or assigns a
-ticket to you (or takes one away). Alerts arrive over a Power Automate webhook as a plain
-Teams message: one sentence saying what happened, then the comment text, then the ticket's
-summary and an Open link.
+<p align="center"><samp>a Teams DM when Jira actually needs me</samp></p>
 
-No Jira admin rights, no server: a timer on your own machine runs one polling cycle
-every 5 minutes, authenticating as you with a Personal Access Token.
+<p align="center"><code>MIT</code> <code>python 3.12</code> <code>one dependency</code> · <samp><a href="https://github.com/godfreyponce">github</a> / <a href="https://www.linkedin.com/in/godfreyponce/">linkedin</a> / <a href="https://godfreyponce.dev">personal website</a></samp></p>
 
-## How it works
+I wanted to know what tickets were assigned to me and to be the one on top of
+them. My first try was a Jira folder in Outlook, since Jira already emails you
+about everything. That didn't work. I had to remember to navigate to the folder,
+the formatting of Jira's emails is horrible, and it piled up with things from
+last week when all I really needed was what's relevant on my tickets now. So why
+not put it in our main communication instead? I found out Teams has automation
+similar to Apple Shortcuts, played around with it, and got it sending alerts
+straight to me. Teams stays on at all times, on every desktop I use and on my
+Mac. What better place for Jira news to live than the main source of
+communication on our team.
+
+It polls Jira Data Center as me every 5 minutes, from a timer on my own Mac.
+No server, no Jira admin rights. Three kinds of change count:
+
+## 01 · comments
+
+Someone comments on a ticket assigned to me. I get their name and a snippet.
+My own comments never alert: my words are noise, not news. Tickets I merely
+watch or reported do not alert either. They proved too noisy.
+
+## 02 · mentions
+
+An @mention anywhere, even on tickets I have never touched. This one leans
+on Jira's comment text search, and if the server's text index rejects the
+query, it degrades gracefully to my assigned set.
+
+<p align="center"><img src="docs/media/banner-mention.png" alt="Banner: Doe, John mentioned you on RustConversion-4923" width="520"></p>
+<p align="center"><sub><samp>real banner, fake data. john doe approves.</samp></sub></p>
+
+## 03 · assignments
+
+A ticket lands on my plate: "Tag, you're it". A ticket leaves: "Not yours
+anymore :)", with who has it now. Detected by diffing the current assignment set
+against the last cycle's, so a missed run never loses an assignment change.
+
+<p align="center"><img src="docs/media/banner-notyours.png" alt="Banner: Not yours anymore :) RustConversion-4923, now assigned to Jane Doe" width="520"></p>
+<p align="center"><sub><samp>jane doe's problem now.</samp></sub></p>
+
+<!-- demo clip: GitHub renders inline video players only from uploaded
+     attachment URLs. At PR review, drag docs/media/jira-alerts-demo.mp4 into
+     the web editor here and replace the link below with the minted URL. -->
+<p align="center"><a href="docs/media/jira-alerts-demo.mp4">watch all three, back to back (13 s)</a></p>
+<p align="center"><sub><samp>the entire user interface. there is no screen two.</samp></sub></p>
+
+## how it works
 
 ```
-launchd LaunchAgent (every 300 s)
-        │
-        ▼
-scripts/run-local.sh ──► src/run.py ──► Jira REST API (Bearer PAT)
-        │                   • assigned JQL: assignee = currentUser()
-        │                   • mention JQL:  comment ~ your username
-        │                   • per-issue comments classified; your own are skipped
-        ▼
-   dedup (state.json, a local gitignored file)
-        │
-        ▼
-   flat JSON payload ──► Teams Workflows webhook ──► Power Automate flow ──► your chat
+launchd, every 300 seconds
+  └─ python -m src.run          one cycle, about 15 seconds, nothing stays resident
+       ├─ JQL: assignee = currentUser()
+       ├─ JQL: comment ~ my username     (best effort, degrades gracefully)
+       ├─ diff assignments, dedup comments against state.json
+       └─ flat six-field payload ─► Teams webhook ─► Power Automate ─► my chat
 ```
 
-The Teams sink sits behind one function (`notifier.send`). If the webhook ever dies
-(Microsoft churns this area, and it's tied to your organization's tenant), swapping
-in ntfy / Discord / email is a one-file change. The message layout lives in the
-Power Automate flow, not in Python — the script always sends the same six fields.
+619 lines of Python, one dependency (`requests`). The Teams sink is one
+function in a 22-line file, so swapping in ntfy or email is a one-file change.
 
-## Setup
+## what it refuses to send
 
-The full walkthrough — Jira token, finding your user key, building the Power
-Automate flow, picking a timer — is in [docs/ONBOARDING.md](docs/ONBOARDING.md).
-Budget about 30 minutes. Nothing in it needs Jira admin rights.
+- The backlog. The first run seeds silently: it records everything it sees and
+  says nothing. The live seed absorbed 42 existing assignments without a single
+  ping.
+- Bursts. More than 10 cards in one cycle collapses into a single digest. One
+  early burst of about 42 cards taught it that restraint.
+- My own comments, anywhere, ever.
 
-## Run and verify locally
+## set it up
+
+> [!NOTE]
+> The full walkthrough is [docs/ONBOARDING.md](docs/ONBOARDING.md): Jira token,
+> user key, the Power Automate flow, the timer. Budget about 30 minutes. Nothing
+> needs admin rights.
 
 ```bash
-cp .env.example .env      # fill in real values
+cp .env.example .env      # five values, all yours
 pip install -r requirements.txt
-set -a; source .env; set +a
-python -m src.run         # one polling cycle
+python -m src.run         # first run seeds silently, no backlog flood
+./scripts/send-test.sh    # fires a fake alert at your webhook
 ```
 
-The first run seeds silently: it records what it currently sees without notifying,
-so you aren't flooded with backlog. Reset `state.json` to
-`{"initialized": false, "seen": {}}` to re-trigger the seed. To check the Teams
-half without waiting for a real Jira event, `./scripts/send-test.sh` fires a fake
-alert at your webhook.
+## tradeoffs I chose
 
-## Notes and tradeoffs
+- About 5 minutes of latency. Instant needs an admin webhook and a public
+  listener. Polling needs neither.
+- No alerts while my Mac sleeps. The next cycle catches up. This started on
+  GitHub's cron, which delivered about one run per hour against a nominal
+  twelve, so the timer moved home.
+- Mention search leans on Jira's text index. If the server rejects it, alerts
+  fall back to my assigned tickets.
+- No test suite. Verification is a real run with live credentials.
 
-- **Why a local timer and not GitHub Actions cron?** This started on Actions.
-  GitHub's scheduler is best-effort and delivered roughly one run per hour against
-  a nominal twelve, so the cron moved to launchd on the owner's Mac. The workflow
-  file is still in the repo as a fallback; ONBOARDING covers both options.
-- **Latency is ~5 min**, not instant. Instant would need a Jira webhook (admin
-  access) plus a public always-on listener. Polling avoids both.
-- **No alerts while the machine sleeps.** On wake, the next cycle catches up:
-  assignment changes are recovered fully; comments older than `LOOKBACK_MINUTES`
-  (default 30) are dropped by design.
-- **Mention-only tickets** (you're mentioned somewhere you've never touched) rely
-  on Jira's `comment ~ username` text search, which depends on how the DC text
-  index tokenizes. If your instance rejects it, the script degrades gracefully to
-  the assigned-tickets set.
-- **Tuning** via env vars: `LOOKBACK_MINUTES`, `PRUNE_DAYS`, `COMMENTS_PER_ISSUE`,
-  `SNIPPET_CHARS`.
+More detail, including the one-pager for non-technical visitors:
+[site](https://godfreyponce.github.io/Jira-Alerts/) ·
+[docs/](docs/)
 
-## Possible next steps
-
-- Run the comment through the Anthropic API to generate a one-line summary instead
-  of a raw snippet.
-- Add a GitHub source (PR review-requests / @mentions) behind the same notifier.
+<sub>MIT © 2026 Godfrey Ponce</sub>
