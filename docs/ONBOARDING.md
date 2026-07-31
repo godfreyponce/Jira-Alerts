@@ -59,17 +59,19 @@ always sends the same six fields — `ticket`, `summary`, `headline`, `subline`,
 
 ```html
 @{if(empty(triggerBody()?['headline']), '', concat('<p><strong>', triggerBody()?['headline'], '</strong></p>'))}
-<p><strong>@{triggerBody()?['ticket']} — @{triggerBody()?['summary']}</strong></p>
 @{if(empty(triggerBody()?['subline']), '', concat('<p><strong>', triggerBody()?['subline'], '</strong></p>'))}
 @{if(empty(triggerBody()?['snippet']), '', concat('<p>', triggerBody()?['snippet'], '</p>'))}
+<p><strong>@{triggerBody()?['summary']}</strong></p>
 <p><a href="@{triggerBody()?['url']}">Open Ticket #@{last(split(triggerBody()?['ticket'], '-'))}</a></p>
 ```
 
-   The notification banner previews the message's first words, so alerts with a
-   `headline` (assignments, mentions, reassignments) lead with it, and plain comments
-   lead with the ticket line. The `concat(...)` lines emit their paragraph only when
-   the field has content, so empty fields don't render blank gaps. The last line is
-   the message's only hyperlink, standing in for the card's Open button.
+   The notification banner is this message with the HTML stripped and only the first few
+   lines kept, so every alert leads with `headline` — one complete sentence that already
+   names the ticket. `subline` and `snippet` follow, and the ticket's own summary comes
+   last: it's context rather than news, and a long one up top would push the comment text
+   out of the banner entirely. The `concat(...)` lines emit their paragraph only when the
+   field has content, so empty fields don't render blank gaps. The last line is the
+   message's only hyperlink, standing in for the card's Open button.
 
 4. Save the flow and copy the **HTTP POST URL** from the trigger. That's your
    `TEAMS_WEBHOOK_URL`.
@@ -99,11 +101,12 @@ Card layout into the **Adaptive Card** field, using the same
   "version": "1.4",
   "body": [
     { "type": "TextBlock", "text": "@{triggerBody()?['headline']}",
-      "size": "Small", "weight": "Bolder", "color": "Accent" },
-    { "type": "TextBlock", "wrap": true, "weight": "Bolder",
-      "text": "[@{triggerBody()?['ticket']}](@{triggerBody()?['url']}) @{triggerBody()?['summary']}" },
-    { "type": "TextBlock", "text": "@{triggerBody()?['subline']}", "isSubtle": true, "wrap": true },
-    { "type": "TextBlock", "text": "@{triggerBody()?['snippet']}", "wrap": true }
+      "wrap": true, "weight": "Bolder" },
+    { "type": "TextBlock", "text": "@{triggerBody()?['subline']}",
+      "wrap": true, "weight": "Bolder" },
+    { "type": "TextBlock", "text": "@{triggerBody()?['snippet']}", "wrap": true },
+    { "type": "TextBlock", "text": "@{triggerBody()?['summary']}",
+      "wrap": true, "isSubtle": true }
   ],
   "actions": [
     { "type": "Action.OpenUrl", "title": "Open in Jira", "url": "@{triggerBody()?['url']}" }

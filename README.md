@@ -2,9 +2,9 @@
 
 Polls **Jira Data Center** every 5 minutes and DMs you in **Microsoft Teams** when
 someone comments on a ticket assigned to you, @mentions you anywhere, or assigns a
-ticket to you (or takes one away). Alerts land as a plain Teams message with a
-card-like layout — bold headline, ticket key as a link, a short snippet — via a
-Power Automate webhook.
+ticket to you (or takes one away). Alerts arrive over a Power Automate webhook as a plain
+Teams message: one sentence saying what happened, then the comment text, then the ticket's
+summary and an Open link.
 
 No Jira admin rights, no server: a timer on your own machine runs one polling cycle
 every 5 minutes, authenticating as you with a Personal Access Token.
