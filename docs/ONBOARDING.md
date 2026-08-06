@@ -22,7 +22,7 @@ Python 3.12+ and the `requests` package are the only runtime needs
 ## 2. Create a Jira Personal Access Token
 
 Jira → your avatar → **Profile → Personal Access Tokens → Create token**. Name it, set
-an expiry, copy the token. Write the expiry date somewhere you'll see it — when the
+an expiry, copy the token. Write the expiry date somewhere you'll see it: when the
 token dies, the notifier goes silent with no error you'll ever notice.
 
 ## 3. Find your username and user key
@@ -46,15 +46,18 @@ tokens from these two values. Get either one wrong and mentions silently stop ma
 
 The Python script does not talk to Teams directly. It POSTs a flat JSON payload to a
 webhook, and a Power Automate flow you own turns that into a Teams DM. The script
-always sends the same six fields — `ticket`, `summary`, `headline`, `subline`,
-`snippet`, `url` — so one flow covers every alert type.
+always sends the same six fields (`ticket`, `summary`, `headline`, `subline`,
+`snippet`, `url`), so one flow covers every alert type.
 
 1. Go to [make.powerautomate.com](https://make.powerautomate.com) → **Create** →
    **Instant cloud flow** → skip → add the trigger
    **"When a Teams webhook request is received"**. Set *Who can trigger the flow* to
-   **Anyone** (the URL itself is the secret — treat it like a password).
+   **Anyone** (the URL itself is the secret, so treat it like a password).
 2. Add the action **"Post message in a chat or channel"**. Post as **Flow bot**, post
    in **Chat with Flow bot**, recipient: your own email.
+
+   ![The finished flow in Power Automate: a Teams webhook trigger feeding a post-message action](images/power-automate-flow.png)
+
 3. In the **Message** box, switch to code view (the `</>` toggle) and paste:
 
 ```html
@@ -66,7 +69,7 @@ always sends the same six fields — `ticket`, `summary`, `headline`, `subline`,
 ```
 
    The notification banner is this message with the HTML stripped and only the first few
-   lines kept, so every alert leads with `headline` — one complete sentence that already
+   lines kept, so every alert leads with `headline`, one complete sentence that already
    names the ticket. `subline` and `snippet` follow, and the ticket's own summary comes
    last: it's context rather than news, and a long one up top would push the comment text
    out of the banner entirely. The `concat(...)` lines emit their paragraph only when the
@@ -80,12 +83,12 @@ always sends the same six fields — `ticket`, `summary`, `headline`, `subline`,
 
 The text and the layout live in different places:
 
-- **What the alerts say** — the headlines and sublines are plain strings in
+- **What the alerts say:** the headlines and sublines are plain strings in
   `src/cards.py` (`comment_payload`, `assigned_payload`, `reassigned_payload`).
   This repo ships with "Tag, you're it" for new assignments and
   "Not yours anymore :)" for reassignments; edit those strings to taste. No flow
-  changes needed — the flow just displays whatever the script sends.
-- **How the message looks** — the HTML you pasted in step 3. Edit it in the flow;
+  changes needed; the flow just displays whatever the script sends.
+- **How the message looks:** the HTML you pasted in step 3. Edit it in the flow;
   the script never needs to change.
 
 ### Prefer the card look?
@@ -114,9 +117,9 @@ Card layout into the **Adaptive Card** field, using the same
 }
 ```
 
-The catch: card notifications always read "Sent a card" — a Microsoft limitation of
-the action, nothing you or the payload can change. That's why the plain message above
-is the default here.
+The catch: card notifications always read "Sent a card". That's a Microsoft limitation
+of the action, nothing you or the payload can change, and it's why the plain message
+above is the default here.
 
 ## 5. Configure and do a first run
 
@@ -130,7 +133,7 @@ The first run seeds silently: it records every comment and assignment it current
 sees without notifying, so you don't get flooded with backlog. It prints something
 like `Initialized: seeded N comment(s) and M current assignment(s)`.
 
-To confirm the webhook and flow work, run `./scripts/send-test.sh` — it fires a fake
+To confirm the webhook and flow work, run `./scripts/send-test.sh`. It fires a fake
 alert at your webhook and prints the HTTP status (expect 202, and a "Test alert"
 message in your Teams chat a moment later).
 
@@ -211,7 +214,7 @@ Know what you're signing up for:
 - **60-day pause.** GitHub disables the schedule after 60 days without repo activity.
   Any commit re-arms it.
 - **Cache eviction.** Dedup state persists in the Actions cache, which GitHub evicts
-  after ~7 days without use. After eviction the next run re-seeds silently — you miss
+  after ~7 days without use. After eviction the next run re-seeds silently: you miss
   whatever happened in between, with no error.
 
 ## Known quirks
