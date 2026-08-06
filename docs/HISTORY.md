@@ -34,6 +34,52 @@ so no code path was touched and no polling run was warranted; the launchd timer 
 stopped. ONBOARDING went 11 to 0; this file's pre-existing entries went 28 to 3, the survivors
 confirmed by eye as the quoted strings above (this entry re-quotes those same three).
 
+## 2026-07-31 · Recruiter-facing README, usage and architecture docs, Pages one-pager (PR #16)
+
+**What changed (`README.md`).** Rebuilt as a first-person front door for a reader who does not
+work here, rather than a setup manual: banner hero from a real capture, the origin story, the
+three alert streams each with its own screenshot, how it works, a "what it refuses to send"
+section, a pointer to setup instead of inline steps, and the tradeoffs. The run/verify and tuning
+material the README used to carry moved out rather than being deleted (see below). Every number in
+the copy was recounted against HEAD: 619 lines of Python, one dependency, a 22-line notifier, a
+42-assignment silent seed. The 619 still holds, since no code has landed since.
+
+**What changed (new docs).** `docs/USAGE.md` (85 lines) took the old README's day-to-day running,
+reading the output, tuning, and known quirks. `docs/ARCHITECTURE.md` (101 lines) was written fresh
+from `src/`: one cycle start to finish, the six-field payload contract, what Jira Data Center and
+Teams each forced on the design, and why polling plus launchd instead of a server. Nothing another
+doc linked to was lost in the move.
+
+**What changed (the public site).** `site/index.html` (155 lines) is a one-pager aimed at
+non-technical visitors, and `.github/workflows/pages.yml` (35 lines) publishes it. The workflow
+serves `site/` only, so `STATE.md` and the internal docs stay off the web, and it copies
+`docs/media/` into the artifact. This is the change that moved GitHub Pages off `README.md`:
+editing the README no longer affects godfreyponce.github.io.
+
+**Media.** `docs/media/` gained three banner captures (mention, tag, not-yours), a 13.5 s montage
+clip, and `social-preview.png` at 1280x640 for the repo settings. All of it came from a 2026-07-31
+recording session firing fake data through the real webhook, so the screenshots are the product,
+not mockups.
+
+**Same-day follow-up (commit `0f04905`).** GitHub plays video inline only from an uploaded
+attachment URL, never from a repo path, so the clip shipped as a click-to-play link and the owner
+dragged the mp4 into the README in the web editor afterward. That minted `user-attachments` URL is
+what the README embeds today.
+
+**Verification.** Docs and assets only, no `src/` change, so no polling cycle was warranted. The
+Pages pipeline is its own proof and it took two runs: the deploy fired by the merge failed with
+`404 ... Ensure GitHub Pages has been enabled`, which is precisely the caveat the PR had flagged
+for itself (merging publishes nothing by itself). The owner enabled Pages, and the re-run seven
+minutes later went green. Repo description, topics, website field, and the social-preview upload
+were each separate post-merge confirmations, not part of the diff.
+
+**Process note.** #16 had no backing issue and was built in a parallel session outside the
+`AGENTS.md` two-session protocol, on branch `readme-refresh` (merge commit `020806f`, squashed
+content in `12e3db5`). That is why this entry carries the merge date but was written on 2026-08-06,
+reconstructed from the PR body and the diff. The branch was deleted from the remote that same day.
+STATE.md had recorded the merge as 2026-08-06; the commit is dated 2026-07-31, and 08-06 is when
+the em-dash session collided with it on push.
+
 ## 2026-07-31 · Teams toast formatting: headline as lead sentence (#15)
 
 **What changed (repo side, `src/cards.py`).** `headline` is now a complete sentence that

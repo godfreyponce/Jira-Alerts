@@ -2,9 +2,9 @@
 glass: jiraalerts
 status: in-progress
 last_worked_on: 2026-08-06
-next_action: "No feature ticket is green-lit. #9 (external cron → workflow_dispatch), #1 (Anthropic-summarized comments), and #2 (GitHub notification source) are all unlabeled; none may be started until the owner adds ready-for-agent. Do not pick one yourself. What IS actionable is two pieces of bookkeeping left by PR #16, both described under Now: (a) write the missing docs/HISTORY.md entry for #16, reconstructable from its PR body and diff, then let the owner review it; (b) delete the merged readme-refresh branch from the remote. Neither is a blocker, both are safe, and (b) needs nothing but a confirmation. If the owner has since green-lit a ticket, that ticket wins over both."
-blocked_on: "Feature work only: no open issue carries ready-for-agent, so the queue needs owner triage before any of #9, #1, or #2 can start. The two #16 cleanups are not blocked."
-phase: "v1 shipped, onboarding-ready, alert wording settled, and the repo is now recruiter-facing. #4-#8 and #10-#15 closed and owner-accepted (see docs/HISTORY.md): .env.example, docs/ONBOARDING.md, send-test.sh, plain card-like Teams message, self-comment filter, launchd-era README, author-var cleanup, explainer artifact, toast formatting. Timer moved off the GitHub Actions cron to a local launchd LaunchAgent 2026-07-30 (#10) after the cloud scheduler delivered ~1 run/hour against a nominal 12. Ticket protocol bootstrapped from ~/Developer/docs/ticket-protocol-template.md 2026-07-31; #15 was the first ticket built under it and the first to use a ticket branch. PR #16 (merged 2026-08-06, built in a parallel session with no backing issue) rewrote README as a first-person recruiter front door and added docs/USAGE.md, docs/ARCHITECTURE.md, a site/index.html Pages one-pager, docs/media screenshots and a demo clip, and .github/workflows/pages.yml. Reader-facing prose went em-dash-free the same day. Nothing is queued — every open issue awaits owner green-light."
+next_action: "Nothing is actionable without the owner. The board is clean: no work in flight, no leftover branches, no gaps in the archive. #9 (external cron → workflow_dispatch), #1 (Anthropic-summarized comments), and #2 (GitHub notification source) are all unlabeled, so none may be started until the owner adds ready-for-agent. Do not pick one yourself and do not start exploratory work to 'get ahead' on one. If a session opens here with no green-lit ticket, say so and stop. Of the three, #9 is the one with a live justification (no alerts while the Mac sleeps is a gap already hit in practice); #1 and #2 are genuine backlog. That is a recommendation for the owner's triage, not permission."
+blocked_on: "Everything. No open issue carries ready-for-agent, so the queue needs owner triage before any of #9, #1, or #2 can start. There is no unblocked bookkeeping left."
+phase: "v1 shipped, onboarding-ready, alert wording settled, and the repo is now recruiter-facing. #4-#8 and #10-#15 closed and owner-accepted (see docs/HISTORY.md): .env.example, docs/ONBOARDING.md, send-test.sh, plain card-like Teams message, self-comment filter, launchd-era README, author-var cleanup, explainer artifact, toast formatting. Timer moved off the GitHub Actions cron to a local launchd LaunchAgent 2026-07-30 (#10) after the cloud scheduler delivered ~1 run/hour against a nominal 12. Ticket protocol bootstrapped from ~/Developer/docs/ticket-protocol-template.md 2026-07-31; #15 was the first ticket built under it and the first to use a ticket branch. PR #16 (merged 2026-07-31, built in a parallel session with no backing issue) rewrote README as a first-person recruiter front door and added docs/USAGE.md, docs/ARCHITECTURE.md, a site/index.html Pages one-pager, docs/media screenshots and a demo clip, and .github/workflows/pages.yml; its archive entry was reconstructed 2026-08-06 and its merged branch deleted then too. Reader-facing prose went em-dash-free 2026-08-06. Nothing is queued — every open issue awaits owner green-light."
 ---
 
 # JiraAlerts — Project State
@@ -28,16 +28,10 @@ Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 
 ## Now
 
-- Nothing in flight. **#9** (external cron → `workflow_dispatch`) is a dormant fallback for alerts-while-the-Mac-sleeps;
-  **#1** (Anthropic-summarized comments) and **#2** (GitHub notification source) are backlog. All
-  three are unlabeled — they need owner green-light before anyone starts.
-- **PR #16 has no `docs/HISTORY.md` entry.** It was built in a parallel session and bypassed the
-  ticket protocol, so the archive has a hole where the biggest docs change in the repo should be.
-  Reconstructable without guesswork: `gh pr view 16` for the intent, `git show 12e3db5 --stat` for
-  the surface. Follow the file's shape (What changed / Why / Verification, middot heading, no em
-  dashes) and file it under 2026-08-06 above the entry this session wrote.
-- **The merged `readme-refresh` branch is still on the remote.** `git push origin --delete
-  readme-refresh` once the owner confirms; it is fully merged into main, so nothing is lost.
+- Nothing in flight, and nothing unblocked. **#9** (external cron → `workflow_dispatch`) is a
+  dormant fallback for alerts-while-the-Mac-sleeps; **#1** (Anthropic-summarized comments) and
+  **#2** (GitHub notification source) are backlog. All three are unlabeled — they need owner
+  green-light before anyone starts.
 
 ## Run / verify (do this first)
 
