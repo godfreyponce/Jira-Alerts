@@ -4,7 +4,7 @@ status: in-progress
 last_worked_on: 2026-08-06
 next_action: "Nothing is green-lit — the queue needs owner triage. #9 (external cron → workflow_dispatch), #1 (Anthropic-summarized comments), and #2 (GitHub notification source) are all unlabeled; none may be started until the owner green-lights one and adds ready-for-agent. Do not pick one yourself."
 blocked_on: ""
-phase: "v1 shipped, onboarding-ready, and the alert wording is settled. #4-#8 and #10-#15 closed and owner-accepted (see docs/HISTORY.md): .env.example, docs/ONBOARDING.md, send-test.sh, plain card-like Teams message, self-comment filter, launchd-era README, author-var cleanup, explainer artifact, toast formatting. Timer moved off the GitHub Actions cron to a local launchd LaunchAgent 2026-07-30 (#10) after the cloud scheduler delivered ~1 run/hour against a nominal 12. Ticket protocol bootstrapped from ~/Developer/docs/ticket-protocol-template.md 2026-07-31; #15 was the first ticket built under it and the first to use a ticket branch. Nothing is queued — every open issue awaits owner green-light."
+phase: "v1 shipped, onboarding-ready, alert wording settled, and the repo is now recruiter-facing. #4-#8 and #10-#15 closed and owner-accepted (see docs/HISTORY.md): .env.example, docs/ONBOARDING.md, send-test.sh, plain card-like Teams message, self-comment filter, launchd-era README, author-var cleanup, explainer artifact, toast formatting. Timer moved off the GitHub Actions cron to a local launchd LaunchAgent 2026-07-30 (#10) after the cloud scheduler delivered ~1 run/hour against a nominal 12. Ticket protocol bootstrapped from ~/Developer/docs/ticket-protocol-template.md 2026-07-31; #15 was the first ticket built under it and the first to use a ticket branch. PR #16 (merged 2026-08-06, built in a parallel session with no backing issue) rewrote README as a first-person recruiter front door and added docs/USAGE.md, docs/ARCHITECTURE.md, a site/index.html Pages one-pager, docs/media screenshots and a demo clip, and .github/workflows/pages.yml. Reader-facing prose went em-dash-free the same day. Nothing is queued — every open issue awaits owner green-light."
 ---
 
 # JiraAlerts — Project State
@@ -17,11 +17,22 @@ Microsoft Teams (plain message, card-like layout, via a Power Automate webhook) 
 *Thin snapshot, written once per ticket at accept time. Per-feature detail: `docs/HISTORY.md`.
 Work queue: GitHub Issues (`gh issue list`). Protocol: `AGENTS.md`.*
 
+## Docs map (six surfaces now — edit the right one)
+
+- `README.md` — recruiter front door. First person, media-heavy. **Not** the Pages site.
+- `site/index.html` — the Pages one-pager for non-technical visitors. Deploys on its own.
+- `docs/ONBOARDING.md` — fork-and-set-up walkthrough for someone standing their own copy up.
+- `docs/USAGE.md` — day-to-day running, reading output, tuning, quirks.
+- `docs/ARCHITECTURE.md` — how one cycle works and why it is shaped that way.
+- `docs/HISTORY.md` — per-feature build archive. Protocol itself: `AGENTS.md`.
+
 ## Now
 
 - Nothing in flight. **#9** (external cron → `workflow_dispatch`) is a dormant fallback for alerts-while-the-Mac-sleeps;
   **#1** (Anthropic-summarized comments) and **#2** (GitHub notification source) are backlog. All
   three are unlabeled — they need owner green-light before anyone starts.
+- Two loose ends from PR #16, both cosmetic: it has no `docs/HISTORY.md` entry (it bypassed the
+  ticket protocol), and the merged `readme-refresh` branch still sits on the remote.
 
 ## Run / verify (do this first)
 
@@ -33,6 +44,10 @@ python -m src.run             # one polling cycle; first run seeds silently
 No test suite — verify = `python -m py_compile src/*.py`, then `./scripts/send-test.sh` (expect
 HTTP 202) and a real cycle. Production is the LaunchAgent `com.jiraalerts.poll` (every 300 s);
 log at `~/Library/Logs/jiraalerts.log`; manual run = `./scripts/run-local.sh`.
+
+Docs-only changes need none of that. The Pages site is a separate pipeline:
+`.github/workflows/pages.yml` publishes `site/` on pushes touching `site/**`, `docs/media/**`,
+or the workflow itself (`gh run list --workflow=pages.yml` to check).
 
 ## Gotchas (short form)
 
@@ -53,6 +68,11 @@ log at `~/Library/Logs/jiraalerts.log`; manual run = `./scripts/run-local.sh`.
 - Assignment alerts never retry a failed send (the diff advances regardless) — only comment alerts retry.
 - If ever reverting to the cloud cron (`gh workflow enable poll.yml`): its cached state is stale →
   it will silently re-seed; GitHub also pauses crons after 60 idle days.
+- **`git pull` before starting.** Work has landed on main from a parallel Claude session and
+  from direct edits on GitHub. On 2026-08-06 that cost a rejected push and a rebase when PR #16
+  rewrote README mid-session. Check `git log origin/main` before planning anything.
+- **GitHub Pages serves `site/index.html`, not `README.md`.** It moved there in #16; editing the
+  README changes nothing on godfreyponce.github.io, and the deploy only fires on the paths above.
 - **Reader-facing docs are em-dash-free** (`README.md`, `docs/ONBOARDING.md`, `docs/HISTORY.md`,
   `docs/ARCHITECTURE.md`, `docs/USAGE.md`, `site/index.html`, as of 2026-08-06); do not
   reintroduce them there. Agent-facing files (this one, `AGENTS.md`, `.claude/commands/`, plans
