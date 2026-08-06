@@ -1,7 +1,7 @@
 ---
 glass: jiraalerts
 status: in-progress
-last_worked_on: 2026-07-31
+last_worked_on: 2026-08-06
 next_action: "Nothing is green-lit — the queue needs owner triage. #9 (external cron → workflow_dispatch), #1 (Anthropic-summarized comments), and #2 (GitHub notification source) are all unlabeled; none may be started until the owner green-lights one and adds ready-for-agent. Do not pick one yourself."
 blocked_on: ""
 phase: "v1 shipped, onboarding-ready, and the alert wording is settled. #4-#8 and #10-#15 closed and owner-accepted (see docs/HISTORY.md): .env.example, docs/ONBOARDING.md, send-test.sh, plain card-like Teams message, self-comment filter, launchd-era README, author-var cleanup, explainer artifact, toast formatting. Timer moved off the GitHub Actions cron to a local launchd LaunchAgent 2026-07-30 (#10) after the cloud scheduler delivered ~1 run/hour against a nominal 12. Ticket protocol bootstrapped from ~/Developer/docs/ticket-protocol-template.md 2026-07-31; #15 was the first ticket built under it and the first to use a ticket branch. Nothing is queued — every open issue awaits owner green-light."
@@ -53,3 +53,8 @@ log at `~/Library/Logs/jiraalerts.log`; manual run = `./scripts/run-local.sh`.
 - Assignment alerts never retry a failed send (the diff advances regardless) — only comment alerts retry.
 - If ever reverting to the cloud cron (`gh workflow enable poll.yml`): its cached state is stale →
   it will silently re-seed; GitHub also pauses crons after 60 idle days.
+- **Reader-facing docs are em-dash-free** (`README.md`, `docs/ONBOARDING.md`, `docs/HISTORY.md`,
+  `docs/ARCHITECTURE.md`, `docs/USAGE.md`, `site/index.html`, as of 2026-08-06); do not
+  reintroduce them there. Agent-facing files (this one, `AGENTS.md`, `.claude/commands/`, plans
+  and specs) and the `src/cards.py` alert strings deliberately keep theirs, so the em dashes
+  still in HISTORY are all verbatim quotes of those strings.

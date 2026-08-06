@@ -2,6 +2,38 @@
 
 *Created at convention adoption 2026-07-13. STATE.md is the thin quick-resume snapshot; per-feature detail accrues here as the owner accepts work. The work queue lives in GitHub Issues. v1 behavior, setup, and tradeoffs are documented in README.md.*
 
+## 2026-08-06 · Reader-facing docs go em-dash-free, ONBOARDING gains a flow screenshot
+
+**What changed.** The 39 em dashes in `docs/ONBOARDING.md` (11) and this file (28) were
+replaced with the punctuation that fit each site: parentheses for paired appositives, colons
+where a clause explained the one before it, commas for appositives, periods where one sentence
+was doing two jobs. The dated headings here switched from an em dash to a middot separator,
+because four of the titles already contain a colon and `2026-07-30: send-test.sh: verify…`
+read badly. Three em dashes survive in this file on purpose, being verbatim quotes of strings
+that exist now or once did: `cards.py`'s `Tag, you're it — ABC-1.`, the `@{ticket} — ` prefix
+that #15 took off the flow, and the pre-#15 banner text `"Assigned to you — ABC-1234: …"`.
+Stripping those would stop the archive matching the code.
+
+`README.md` was in scope too and had three, but #16 landed its full recruiter-facing rewrite
+mid-session and the new copy was already dash-free, so the rewrite superseded those edits and
+they were dropped at rebase. `docs/ARCHITECTURE.md`, `docs/USAGE.md`, and `site/index.html`,
+all new in #16, were checked and are clean. #16 also moved GitHub Pages off the README: the
+site now builds from `site/` via `.github/workflows/pages.yml`.
+
+`docs/images/power-automate-flow.png` shows the finished two-node flow (Teams webhook trigger
+feeding a post-message action) and sits under step 2 of ONBOARDING §4, the step whose result it
+actually shows, rather than step 1.
+
+**Scope decision.** The owner scoped this to reader-facing prose only. `AGENTS.md`, `STATE.md`,
+`.claude/commands/`, the issue template, and the archived plans and specs keep their em dashes
+(50 and 99 of them respectively), as does the live alert string in `src/cards.py`, whose wording
+#15 had only just settled. Editing that string would change the Teams DM, not a doc.
+
+**Verification.** Docs-only. `git diff --name-only -- 'src/*.py' 'scripts/*'` came back empty,
+so no code path was touched and no polling run was warranted; the launchd timer was never
+stopped. ONBOARDING went 11 to 0; this file's pre-existing entries went 28 to 3, the survivors
+confirmed by eye as the quoted strings above (this entry re-quotes those same three).
+
 ## 2026-07-31 · Teams toast formatting: headline as lead sentence (#15)
 
 **What changed (repo side, `src/cards.py`).** `headline` is now a complete sentence that
