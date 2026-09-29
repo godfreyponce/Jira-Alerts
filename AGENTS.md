@@ -62,18 +62,48 @@ exist, so write it to the right file the moment it's made.
 
 # Verification scope
 
-**There is no test suite.** Verifying a change means running the real thing.
+**There is no test suite.** Verifying a change means running the real thing, so "write the failing
+test first" does not apply here; the plan says which of the checks below proves which task.
 
 - **While iterating**, the cheap gate is `python -m py_compile src/*.py` (or an import check).
   Config is env-var driven — `src/config.py`'s `_require()` exits clearly on a missing var.
-- **At the end of `/build-ticket`**, once: `./scripts/send-test.sh` for the Teams path (expect
-  HTTP 202), then a full `python -m src.run` cycle against live Jira. Paste the real output —
-  but never paste a webhook URL, token, or the Jira hostname; the repo and the transcript are public.
+- **At the end of `/build-ticket`**, once: the full check below.
 - **The Teams message layout is not in this repo.** It lives in the owner's Power Automate flow,
-  and only the owner can edit it. A green `send-test.sh` proves the webhook works, not that a
-  layout change landed.
+  and only the owner can edit it. A plan that changes what the alert looks like calls out the flow
+  edit as a separate, owner-performed step and says exactly what HTML to paste. A green
+  `send-test.sh` against an unedited flow proves the webhook works, not that a layout change landed.
 - **Stop what you started.** The launchd timer (`com.jiraalerts.poll`) runs on its own; if you
   unload it to test something, load it back before ending the session.
+
+The full check. **Paste the real output**, never a claim about it:
+
+```bash
+python -m py_compile src/*.py            # syntax gate, cheap, run it always
+./scripts/send-test.sh                   # Teams path — expect HTTP 202
+set -a; source .env; set +a
+python -m src.run                        # one real cycle against live Jira
+```
+
+`send-test.sh` and `python -m src.run` both hit live services with the owner's real credentials.
+Run them, but never paste anything they print that contains a webhook URL, a token, or the
+owner's Jira hostname — this repo is public and so is the transcript.
+
+# Visual rule
+
+The only visual surface is the Teams message. This repo sends the *data* (`src/cards.py`); the
+layout lives in the owner's Power Automate flow (see "Verification scope"). A ticket that changes
+how the alert looks still gets 3 single-file HTML variants first; the owner picks. Three variants
+means three shapes — a second flavor of the first shape doesn't count. Variants go in
+`docs/superpowers/variants/YYYY-MM-DD-issue-N-<name>-{a,b,c}.html`; the winner is the HTML the
+owner pastes into the flow, with any new data fields it needs wired into `src/cards.py`, and the
+losing variants are kept. Variants use placeholder data, never a real ticket URL or the Jira
+hostname: the kept files are public.
+
+# Commit format
+
+`type(scope): summary (refs #N)` — `type: summary` when there is no useful scope. Trailers: the
+harness default `Co-Authored-By` line, nothing else. No commit hook. The repo is public: the
+message names files and behavior, never env values or hostnames.
 
 ---
 
