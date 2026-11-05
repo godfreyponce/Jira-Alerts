@@ -2,7 +2,7 @@
 
 <p align="center"><samp>a Teams DM when Jira actually needs me</samp></p>
 
-<p align="center"><code>MIT</code> <code>python 3.12</code> <code>one dependency</code> · <samp><a href="https://github.com/godfreyponce">github</a> / <a href="https://www.linkedin.com/in/godfreyponce/">linkedin</a> / <a href="https://godfreyponce.dev">personal website</a></samp></p>
+<p align="center"><code>MIT</code> <code>python 3.12</code> <code>one dependency</code>, <samp><a href="https://github.com/godfreyponce">github</a> / <a href="https://www.linkedin.com/in/godfreyponce/">linkedin</a> / <a href="https://godfreyponce.dev">personal website</a></samp></p>
 
 I wanted to know what tickets were assigned to me and to be the one on top of
 them. My first try was a Jira folder in Outlook, since Jira already emails you
@@ -16,15 +16,18 @@ Mac. What better place for Jira news to live than the main source of
 communication on our team.
 
 It polls Jira Data Center as me every 5 minutes, from a timer on my own Mac.
-No server, no Jira admin rights. Three kinds of change count:
+No server, no Jira admin rights. [jiraPlane](https://github.com/godfreyponce/jiraPlane) took over these DMs, so
+this timer is retired. The code is still here if you want just the Teams part.
 
-## 01 · comments
+Three kinds of change count:
+
+## 01: comments
 
 Someone comments on a ticket assigned to me. I get their name and a snippet.
 My own comments never alert: my words are noise, not news. Tickets I merely
 watch or reported do not alert either. They proved too noisy.
 
-## 02 · mentions
+## 02: mentions
 
 An @mention anywhere, even on tickets I have never touched. This one leans
 on Jira's comment text search, and if the server's text index rejects the
@@ -33,7 +36,7 @@ query, it degrades gracefully to my assigned set.
 <p align="center"><img src="docs/media/banner-mention.png" alt="Banner: Doe, John mentioned you on RustConversion-4923" width="520"></p>
 <p align="center"><sub><samp>real banner, fake data. john doe approves.</samp></sub></p>
 
-## 03 · assignments
+## 03: assignments
 
 A ticket lands on my plate: "Tag, you're it". A ticket leaves: "Not yours
 anymore :)", with who has it now. Detected by diffing the current assignment set
@@ -94,7 +97,7 @@ python -m src.run         # first run seeds silently, no backlog flood
 - No test suite. Verification is a real run with live credentials.
 
 More detail, including the one-pager for non-technical visitors:
-[site](https://godfreyponce.github.io/Jira-Alerts/) ·
+[site](https://godfreyponce.github.io/Jira-Alerts/),
 [docs/](docs/)
 
 <sub>MIT © 2026 Godfrey Ponce</sub>
