@@ -16,7 +16,10 @@ Mac. What better place for Jira news to live than the main source of
 communication on our team.
 
 It polls Jira Data Center as me every 5 minutes, from a timer on my own Mac.
-No server, no Jira admin rights. Three kinds of change count:
+No server, no Jira admin rights. [jiraPlane](https://github.com/godfreyponce/jiraPlane) took over these DMs, so
+this timer is retired. The code is still here if you want just the Teams part.
+
+Three kinds of change count:
 
 ## 01 · comments
 
